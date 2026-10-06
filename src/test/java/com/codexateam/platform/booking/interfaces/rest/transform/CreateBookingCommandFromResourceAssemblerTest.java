@@ -52,4 +52,41 @@ public class CreateBookingCommandFromResourceAssemblerTest {
         assertEquals(150.0, resource.totalPrice());
         assertEquals("PENDING", resource.status());
     }
+
+    @Test
+    @DisplayName("toCommandFromResource supports single day rental (start equals end) (AAA)")
+    void toCommandFromResource_SingleDayRental_ShouldTransformSuccessfully() {
+        // Arrange
+        Date today = new Date();
+        var resource = new CreateBookingResource(5L, today, today);
+
+        // Act
+        var command = CreateBookingCommandFromResourceAssembler.toCommandFromResource(resource, 8L, 3L);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals(5L, command.vehicleId());
+        assertEquals(8L, command.renterId());
+        assertEquals(3L, command.ownerId());
+        assertEquals(today, command.startDate());
+        assertEquals(today, command.endDate());
+    }
+
+    @Test
+    @DisplayName("BookingResourceFromEntityAssembler reflects CONFIRMED status when booking is confirmed (AAA)")
+    void toResourceFromEntity_ConfirmedStatus_ShouldTransformSuccessfully() {
+        // Arrange
+        Date start = new Date();
+        var command = new CreateBookingCommand(10L, 2L, 1L, start, start);
+        var booking = new Booking(command, 200.0);
+        booking.confirm();
+
+        // Act
+        var resource = BookingResourceFromEntityAssembler.toResourceFromEntity(booking);
+
+        // Assert
+        assertNotNull(resource);
+        assertEquals("CONFIRMED", resource.status());
+        assertEquals(200.0, resource.totalPrice());
+    }
 }

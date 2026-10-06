@@ -22,4 +22,19 @@ public class SignInCommandFromResourceAssemblerTest {
         assertEquals("user@renticar.com", command.email());
         assertEquals("SecretPass123", command.password());
     }
+
+    @Test
+    @DisplayName("toCommandFromResource with special characters in password preserves exact string (AAA)")
+    void toCommandFromResource_WithSpecialChars_ShouldPreserveExactString() {
+        // Arrange
+        var resource = new SignInResource("admin@renticar.pe", "P@$$w0rd!#%&*");
+
+        // Act
+        var command = SignInCommandFromResourceAssembler.toCommandFromResource(resource);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals("admin@renticar.pe", command.email());
+        assertEquals("P@$$w0rd!#%&*", command.password());
+    }
 }

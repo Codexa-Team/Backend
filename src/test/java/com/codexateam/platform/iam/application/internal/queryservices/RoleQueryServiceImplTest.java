@@ -58,4 +58,33 @@ public class RoleQueryServiceImplTest {
         assertEquals(Roles.ROLE_ARRENDADOR, result.get().getName());
         verify(roleRepository, times(1)).findByName(Roles.ROLE_ARRENDADOR);
     }
+
+    @Test
+    @DisplayName("handle(GetAllRolesQuery) should return empty list when no roles exist (AAA)")
+    void handle_GetAllRolesQuery_ShouldReturnEmptyList_WhenNoRoles() {
+        // Arrange
+        when(roleRepository.findAll()).thenReturn(List.of());
+
+        // Act
+        List<Role> result = roleQueryService.handle(new GetAllRolesQuery());
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(roleRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("handle(GetRoleByNameQuery) should return empty Optional when role not found (AAA)")
+    void handle_GetRoleByNameQuery_ShouldReturnEmpty_WhenNotFound() {
+        // Arrange
+        when(roleRepository.findByName(Roles.ROLE_ARRENDATARIO)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<Role> result = roleQueryService.handle(new GetRoleByNameQuery(Roles.ROLE_ARRENDATARIO));
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(roleRepository, times(1)).findByName(Roles.ROLE_ARRENDATARIO);
+    }
 }

@@ -88,4 +88,60 @@ public class TelemetryCommandServiceImplTest {
         verify(externalListingsService, times(1)).isVehicleOwner(10L, 2L);
         verify(telemetryRepository, never()).save(any(Telemetry.class));
     }
+
+    @Test
+    @DisplayName("handle(RecordTelemetryCommand) records zero speed and empty fuel level (AAA)")
+    void handle_RecordTelemetryCommand_ShouldRecordZeroSpeedAndFuel() {
+        // Arrange
+        var command = new RecordTelemetryCommand(10L, -12.0, -77.0, 0.0, 0.0);
+        var vehicleResource = new VehicleResource(10L, "Toyota", "Corolla", 2022, 45.0, "available", "corolla.jpg", 1L, new Date());
+        when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(vehicleResource));
+        when(externalListingsService.isVehicleOwner(10L, 1L)).thenReturn(true);
+        when(telemetryRepository.save(any(Telemetry.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Telemetry result = telemetryCommandService.handle(command, 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0.0, result.getSpeed());
+        assertEquals(0.0, result.getFuelLevel());
+        verify(telemetryRepository, times(1)).save(any(Telemetry.class));
+    }
+
+    @Test
+    @DisplayName("handle(RecordTelemetryCommand) records high speed measurement (AAA)")
+    void handle_RecordTelemetryCommand_ShouldRecordHighSpeed() {
+        // Arrange
+        var command = new RecordTelemetryCommand(10L, -12.0, -77.0, 120.5, 50.0);
+        var vehicleResource = new VehicleResource(10L, "Toyota", "Corolla", 2022, 45.0, "available", "corolla.jpg", 1L, new Date());
+        when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(vehicleResource));
+        when(externalListingsService.isVehicleOwner(10L, 1L)).thenReturn(true);
+        when(telemetryRepository.save(any(Telemetry.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Telemetry result = telemetryCommandService.handle(command, 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(120.5, result.getSpeed());
+    }
+
+    @Test
+    @DisplayName("handle(RecordTelemetryCommand) records full fuel level 100% (AAA)")
+    void handle_RecordTelemetryCommand_ShouldRecordFullFuel() {
+        // Arrange
+        var command = new RecordTelemetryCommand(10L, -12.0, -77.0, 60.0, 100.0);
+        var vehicleResource = new VehicleResource(10L, "Toyota", "Corolla", 2022, 45.0, "available", "corolla.jpg", 1L, new Date());
+        when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(vehicleResource));
+        when(externalListingsService.isVehicleOwner(10L, 1L)).thenReturn(true);
+        when(telemetryRepository.save(any(Telemetry.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Telemetry result = telemetryCommandService.handle(command, 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(100.0, result.getFuelLevel());
+    }
 }

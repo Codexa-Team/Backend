@@ -92,4 +92,34 @@ public class VehicleQueryServiceImplTest {
         assertEquals("BMW", result.get(0).getBrand());
         verify(vehicleRepository, times(1)).findByOwnerId(5L);
     }
+
+    @Test
+    @DisplayName("handle(GetAllVehiclesQuery) should return empty list when no vehicles exist (AAA)")
+    void handle_GetAllVehiclesQuery_ShouldReturnEmptyList_WhenNoVehicles() {
+        // Arrange
+        when(vehicleRepository.findAll()).thenReturn(List.of());
+
+        // Act
+        List<Vehicle> result = vehicleQueryService.handle(new GetAllVehiclesQuery());
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(vehicleRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("handle(GetVehiclesByOwnerIdQuery) should return empty list when owner has no vehicles (AAA)")
+    void handle_GetVehiclesByOwnerIdQuery_ShouldReturnEmptyList_WhenOwnerHasNoVehicles() {
+        // Arrange
+        when(vehicleRepository.findByOwnerId(999L)).thenReturn(List.of());
+
+        // Act
+        List<Vehicle> result = vehicleQueryService.handle(new GetVehiclesByOwnerIdQuery(999L));
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(vehicleRepository, times(1)).findByOwnerId(999L);
+    }
 }

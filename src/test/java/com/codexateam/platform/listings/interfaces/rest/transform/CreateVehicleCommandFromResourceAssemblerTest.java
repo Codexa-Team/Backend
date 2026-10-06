@@ -27,4 +27,20 @@ public class CreateVehicleCommandFromResourceAssemblerTest {
         assertArrayEquals(dummyImage, command.image());
         assertEquals(7L, command.ownerId());
     }
+
+    @Test
+    @DisplayName("toCommandFromResource handles null image gracefully (AAA)")
+    void toCommandFromResource_WithNullImage_ShouldTransformSuccessfully() {
+        // Arrange
+        var resource = new CreateVehicleResource("Toyota", "Yaris", 2022, 40.0);
+
+        // Act
+        var command = CreateVehicleCommandFromResourceAssembler.toCommandFromResource(resource, null, 3L);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals("Toyota", command.brand());
+        assertNull(command.image());
+        assertEquals(3L, command.ownerId());
+    }
 }

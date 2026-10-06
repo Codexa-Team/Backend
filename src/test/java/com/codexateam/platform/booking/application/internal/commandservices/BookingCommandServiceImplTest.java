@@ -239,4 +239,54 @@ public class BookingCommandServiceImplTest {
         // Assert
         verify(bookingRepository, times(1)).deleteById(50L);
     }
+
+    @Test
+    @DisplayName("handle(DeleteBookingCommand) should throw BookingNotFoundException when booking does not exist (AAA)")
+    void handle_DeleteBookingCommand_ShouldThrowException_WhenBookingDoesNotExist() {
+        // Arrange
+        when(bookingRepository.existsById(999L)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(BookingNotFoundException.class, () -> bookingCommandService.handle(new DeleteBookingCommand(999L)));
+        verify(bookingRepository, times(1)).existsById(999L);
+        verify(bookingRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("handle(CreateBookingCommand) should throw VehicleNotAvailableException when vehicle not found in Listings (AAA)")
+    void handle_CreateBookingCommand_ShouldThrowException_WhenVehicleNotFoundInListings() {
+        // Arrange
+        var command = new CreateBookingCommand(404L, 2L, 1L, getDate(1), getDate(3));
+        when(externalListingsService.fetchVehicleById(404L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(VehicleNotAvailableException.class, () -> bookingCommandService.handle(command));
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("handle(CreateBookingCommand) should throw VehicleNotAvailableException when vehicle status is rented (AAA)")
+    void handle_CreateBookingCommand_ShouldThrowException_WhenVehicleAlreadyRented() {
+        // Arrange
+        var command = new CreateBookingCommand(10L, 2L, 1L, getDate(1), getDate(3));
+        var rentedVehicle = new VehicleResource(10L, "Toyota", "Corolla", 2022, 50.0, "rented", "img.jpg", 1L, new Date());
+        when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(rentedVehicle));
+
+        // Act & Assert
+        assertThrows(VehicleNotAvailableException.class, () -> bookingCommandService.handle(command));
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("handle(ConfirmBookingCommand) should throw InvalidBookingStatusException when status is not PENDING (AAA)")
+    void handle_ConfirmBookingCommand_ShouldThrowException_WhenStatusNotPending() {
+        // Arrange
+        var booking = new Booking(new CreateBookingCommand(10L, 2L, 1L, getDate(1), getDate(2)), 80.0);
+        booking.confirm(); // Status is already CONFIRMED
+        when(bookingRepository.findById(100L)).thenReturn(Optional.of(booking));
+
+        // Act & Assert
+        assertThrows(InvalidBookingStatusException.class, () -> bookingCommandService.handle(new ConfirmBookingCommand(100L)));
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
 }

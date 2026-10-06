@@ -101,4 +101,65 @@ public class TelemetryQueryServiceImplTest {
         assertEquals(1, result.size());
         verify(telemetryRepository, times(1)).findByVehicleId(eq(10L), any(Sort.class));
     }
+
+    @Test
+    @DisplayName("handle(GetTelemetryByVehicleIdQuery) throws UnauthorizedAccessException when unauthorized (AAA)")
+    void handle_GetTelemetryByVehicleIdQuery_ShouldThrowUnauthorized() {
+        // Arrange
+        when(externalListingsService.isVehicleOwner(10L, 99L)).thenReturn(false);
+        when(externalBookingService.hasTrackingPermission(99L, 10L)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(UnauthorizedAccessException.class, () -> telemetryQueryService.handle(new GetTelemetryByVehicleIdQuery(10L), 99L));
+        verify(telemetryRepository, never()).findByVehicleId(anyLong(), any(Sort.class));
+    }
+
+    @Test
+    @DisplayName("handle(GetTelemetryByVehicleIdQuery) returns empty list when no records found (AAA)")
+    void handle_GetTelemetryByVehicleIdQuery_ShouldReturnEmptyList_WhenNoRecords() {
+        // Arrange
+        when(externalListingsService.isVehicleOwner(10L, 1L)).thenReturn(true);
+        when(telemetryRepository.findByVehicleId(eq(10L), any(Sort.class))).thenReturn(List.of());
+
+        // Act
+        List<Telemetry> result = telemetryQueryService.handle(new GetTelemetryByVehicleIdQuery(10L), 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(telemetryRepository, times(1)).findByVehicleId(eq(10L), any(Sort.class));
+    }
+
+    @Test
+    @DisplayName("handle(GetLatestTelemetryQuery) returns empty Optional when no records exist (AAA)")
+    void handle_GetLatestTelemetryQuery_ShouldReturnEmpty_WhenNoRecords() {
+        // Arrange
+        when(externalListingsService.isVehicleOwner(10L, 1L)).thenReturn(true);
+        when(telemetryRepository.findFirstByVehicleIdOrderByCreatedAtDesc(10L)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<Telemetry> result = telemetryQueryService.handle(new GetLatestTelemetryQuery(10L), 1L);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(telemetryRepository, times(1)).findFirstByVehicleIdOrderByCreatedAtDesc(10L);
+    }
+
+    @Test
+    @DisplayName("handle(GetTelemetryByVehicleIdQuery) returns records when user is renter with active booking (AAA)")
+    void handle_GetTelemetryByVehicleIdQuery_ShouldReturnRecords_WhenRenterActiveBooking() {
+        // Arrange
+        var t1 = new Telemetry(new RecordTelemetryCommand(10L, -12.0, -77.0, 50.0, 80.0));
+        when(externalListingsService.isVehicleOwner(10L, 2L)).thenReturn(false);
+        when(externalBookingService.hasTrackingPermission(2L, 10L)).thenReturn(true);
+        when(telemetryRepository.findByVehicleId(eq(10L), any(Sort.class))).thenReturn(List.of(t1));
+
+        // Act
+        List<Telemetry> result = telemetryQueryService.handle(new GetTelemetryByVehicleIdQuery(10L), 2L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(telemetryRepository, times(1)).findByVehicleId(eq(10L), any(Sort.class));
+    }
 }

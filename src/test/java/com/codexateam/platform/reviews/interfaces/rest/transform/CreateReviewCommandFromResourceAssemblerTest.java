@@ -44,4 +44,36 @@ public class CreateReviewCommandFromResourceAssemblerTest {
         assertEquals(5, resource.rating());
         assertEquals("Remarkable car!", resource.comment());
     }
+
+    @Test
+    @DisplayName("toCommandFromResource with null comment produces command with null comment (AAA)")
+    void toCommandFromResource_WithNullComment_ShouldTransformSuccessfully() {
+        // Arrange
+        var resource = new CreateReviewResource(10L, 4, null);
+
+        // Act
+        var command = CreateReviewCommandFromResourceAssembler.toCommandFromResource(resource, 2L);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals(10L, command.vehicleId());
+        assertEquals(2L, command.renterId());
+        assertEquals(4, command.rating());
+        assertNull(command.comment());
+    }
+
+    @Test
+    @DisplayName("toCommandFromResource with minimum rating 1 produces valid command (AAA)")
+    void toCommandFromResource_WithMinRating_ShouldTransformSuccessfully() {
+        // Arrange
+        var resource = new CreateReviewResource(10L, 1, "Poor");
+
+        // Act
+        var command = CreateReviewCommandFromResourceAssembler.toCommandFromResource(resource, 2L);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals(1, command.rating());
+        assertEquals("Poor", command.comment());
+    }
 }

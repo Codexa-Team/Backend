@@ -50,4 +50,19 @@ public class RoleCommandServiceImplTest {
         verify(roleRepository, times(Roles.values().length)).existsByName(any(Roles.class));
         verify(roleRepository, never()).save(any(Role.class));
     }
+
+    @Test
+    @DisplayName("handle(SeedRolesCommand) should only save roles that are missing when some exist (AAA)")
+    void handle_SeedRolesCommand_ShouldOnlySaveMissingRoles() {
+        // Arrange
+        when(roleRepository.existsByName(Roles.ROLE_ARRENDADOR)).thenReturn(true);
+        when(roleRepository.existsByName(Roles.ROLE_ARRENDATARIO)).thenReturn(false);
+
+        // Act
+        roleCommandService.handle(new SeedRolesCommand());
+
+        // Assert
+        verify(roleRepository, times(1)).save(argThat(role -> role.getName() == Roles.ROLE_ARRENDATARIO));
+        verify(roleRepository, never()).save(argThat(role -> role.getName() == Roles.ROLE_ARRENDADOR));
+    }
 }

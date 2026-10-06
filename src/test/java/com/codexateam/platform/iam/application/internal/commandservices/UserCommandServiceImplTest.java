@@ -236,4 +236,80 @@ public class UserCommandServiceImplTest {
         verify(userRepository, times(1)).deleteById(1L);
         verifyNoMoreInteractions(userRepository);
     }
+
+    @Test
+    @DisplayName("handle(DeleteUserCommand) should throw UserNotFoundException when user does not exist (AAA)")
+    void handle_DeleteUserCommand_ShouldThrowException_WhenUserDoesNotExist() {
+        // Arrange
+        var command = new DeleteUserCommand(999L);
+        when(userRepository.existsById(999L)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> userCommandService.handle(command));
+        verify(userRepository, times(1)).existsById(999L);
+        verify(userRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("handle(UpdatePasswordCommand) should throw UserNotFoundException when user not found (AAA)")
+    void handle_UpdatePasswordCommand_ShouldThrowUserNotFoundException_WhenUserNotFound() {
+        // Arrange
+        var command = new UpdatePasswordCommand(999L, "CurrentPass123!", "NewPass123!");
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UserNotFoundException.class, () -> userCommandService.handle(command));
+        verify(userRepository, times(1)).findById(999L);
+        verifyNoInteractions(hashingService);
+    }
+
+    @Test
+    @DisplayName("handle(UpdatePasswordCommand) should throw InvalidPasswordException when new password is blank (AAA)")
+    void handle_UpdatePasswordCommand_ShouldThrowException_WhenNewPasswordIsBlank() {
+        // Arrange
+        var user = new User("Estefano", "estefano@renticar.com", "hash");
+        var command = new UpdatePasswordCommand(1L, "CurrentPass123!", "   ");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // Act & Assert
+        InvalidPasswordException ex = assertThrows(InvalidPasswordException.class, () -> userCommandService.handle(command));
+        assertEquals("New password cannot be empty", ex.getMessage());
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("handle(UpdatePasswordCommand) should throw InvalidPasswordException when current password mismatch (AAA)")
+    void handle_UpdatePasswordCommand_ShouldThrowException_WhenCurrentPasswordMismatch() {
+        // Arrange
+        var user = new User("Estefano", "estefano@renticar.com", "hash");
+        var command = new UpdatePasswordCommand(1L, "WrongCurrentPass!", "NewPass123!");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(hashingService.matches("WrongCurrentPass!", "hash")).thenReturn(false);
+
+        // Act & Assert
+        InvalidPasswordException ex = assertThrows(InvalidPasswordException.class, () -> userCommandService.handle(command));
+        assertEquals("Current password is incorrect", ex.getMessage());
+        verify(hashingService, times(1)).matches("WrongCurrentPass!", "hash");
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("handle(UpdateUserCommand) should only update name when email is null (AAA)")
+    void handle_UpdateUserCommand_ShouldOnlyUpdateName_WhenEmailIsNull() {
+        // Arrange
+        var user = new User("Old Name", "same@renticar.com", "hash");
+        var command = new UpdateUserCommand(1L, "New Name", null);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<User> result = userCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("New Name", result.get().getName());
+        assertEquals("same@renticar.com", result.get().getEmailAddress().value());
+        verify(userRepository, times(1)).save(user);
+    }
 }

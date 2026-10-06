@@ -74,4 +74,33 @@ public class UserQueryServiceImplTest {
         assertEquals(2, result.size());
         verify(userRepository, times(1)).findAll();
     }
+
+    @Test
+    @DisplayName("handle(GetAllUsersQuery) should return empty list when no users exist (AAA)")
+    void handle_GetAllUsersQuery_ShouldReturnEmptyList_WhenNoUsers() {
+        // Arrange
+        when(userRepository.findAll()).thenReturn(List.of());
+
+        // Act
+        List<User> result = userQueryService.handle(new GetAllUsersQuery());
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("handle(GetUserByIdQuery) should handle boundary ID Long.MAX_VALUE (AAA)")
+    void handle_GetUserByIdQuery_ShouldHandleMaxLongId() {
+        // Arrange
+        when(userRepository.findById(Long.MAX_VALUE)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<User> result = userQueryService.handle(new GetUserByIdQuery(Long.MAX_VALUE));
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(userRepository, times(1)).findById(Long.MAX_VALUE);
+    }
 }

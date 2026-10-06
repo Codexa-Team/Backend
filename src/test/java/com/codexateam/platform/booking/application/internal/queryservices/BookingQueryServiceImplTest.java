@@ -106,4 +106,19 @@ public class BookingQueryServiceImplTest {
         assertTrue(result.isPresent());
         verify(bookingRepository, times(1)).findFirstByVehicleIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(10L, now, now);
     }
+
+    @Test
+    @DisplayName("handle(GetBookingsByRenterIdQuery) should return empty list when no bookings exist (AAA)")
+    void handle_GetBookingsByRenterIdQuery_ShouldReturnEmptyList_WhenNoBookings() {
+        // Arrange
+        when(bookingRepository.findByRenterId(999L)).thenReturn(List.of());
+
+        // Act
+        List<Booking> result = bookingQueryService.handle(new GetBookingsByRenterIdQuery(999L));
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(bookingRepository, times(1)).findByRenterId(999L);
+    }
 }

@@ -86,4 +86,93 @@ public class ReviewCommandServiceImplTest {
         verify(reviewRepository, times(1)).existsByVehicleIdAndRenterId(10L, 2L);
         verify(reviewRepository, never()).save(any(Review.class));
     }
+
+    @Test
+    @DisplayName("handle(CreateReviewCommand) should return empty Optional when repository save throws exception (AAA)")
+    void handle_CreateReviewCommand_ShouldReturnEmpty_WhenRepositorySaveFails() {
+        // Arrange
+        var command = new CreateReviewCommand(10L, 2L, 4, "Good car");
+        when(bookingContextFacade.hasCompletedBooking(2L, 10L)).thenReturn(true);
+        when(reviewRepository.existsByVehicleIdAndRenterId(10L, 2L)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenThrow(new RuntimeException("DB error"));
+
+        // Act
+        Optional<Review> result = reviewCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("handle(CreateReviewCommand) should allow minimum rating 1 star (AAA)")
+    void handle_CreateReviewCommand_ShouldAllowMinimumRating1() {
+        // Arrange
+        var command = new CreateReviewCommand(10L, 2L, 1, "Terrible condition");
+        when(bookingContextFacade.hasCompletedBooking(2L, 10L)).thenReturn(true);
+        when(reviewRepository.existsByVehicleIdAndRenterId(10L, 2L)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Review> result = reviewCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(1, result.get().getRating());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("handle(CreateReviewCommand) should allow maximum rating 5 stars (AAA)")
+    void handle_CreateReviewCommand_ShouldAllowMaximumRating5() {
+        // Arrange
+        var command = new CreateReviewCommand(10L, 2L, 5, "Best car ever");
+        when(bookingContextFacade.hasCompletedBooking(2L, 10L)).thenReturn(true);
+        when(reviewRepository.existsByVehicleIdAndRenterId(10L, 2L)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Review> result = reviewCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(5, result.get().getRating());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("handle(CreateReviewCommand) should allow null comment (AAA)")
+    void handle_CreateReviewCommand_ShouldAllowNullComment() {
+        // Arrange
+        var command = new CreateReviewCommand(10L, 2L, 4, null);
+        when(bookingContextFacade.hasCompletedBooking(2L, 10L)).thenReturn(true);
+        when(reviewRepository.existsByVehicleIdAndRenterId(10L, 2L)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Review> result = reviewCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertNull(result.get().getComment());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("handle(CreateReviewCommand) should allow empty comment (AAA)")
+    void handle_CreateReviewCommand_ShouldAllowEmptyComment() {
+        // Arrange
+        var command = new CreateReviewCommand(10L, 2L, 3, "");
+        when(bookingContextFacade.hasCompletedBooking(2L, 10L)).thenReturn(true);
+        when(reviewRepository.existsByVehicleIdAndRenterId(10L, 2L)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Review> result = reviewCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("", result.get().getComment());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
 }

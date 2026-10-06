@@ -74,4 +74,48 @@ public class ReviewQueryServiceImplTest {
         assertEquals(5, result.get().getRating());
         verify(reviewRepository, times(1)).findById(1L);
     }
+
+    @Test
+    @DisplayName("handle(GetReviewsByVehicleIdQuery) should return empty list when no reviews exist (AAA)")
+    void handle_GetReviewsByVehicleIdQuery_ShouldReturnEmptyList_WhenNoReviews() {
+        // Arrange
+        when(reviewRepository.findByVehicleId(999L)).thenReturn(List.of());
+
+        // Act
+        List<Review> result = reviewQueryService.handle(new GetReviewsByVehicleIdQuery(999L));
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(reviewRepository, times(1)).findByVehicleId(999L);
+    }
+
+    @Test
+    @DisplayName("handle(GetReviewsByRenterIdQuery) should return empty list when renter has no reviews (AAA)")
+    void handle_GetReviewsByRenterIdQuery_ShouldReturnEmptyList_WhenNoReviews() {
+        // Arrange
+        when(reviewRepository.findByRenterId(999L)).thenReturn(List.of());
+
+        // Act
+        List<Review> result = reviewQueryService.handle(new GetReviewsByRenterIdQuery(999L));
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(reviewRepository, times(1)).findByRenterId(999L);
+    }
+
+    @Test
+    @DisplayName("handle(GetReviewByIdQuery) should return empty Optional when review not found (AAA)")
+    void handle_GetReviewByIdQuery_ShouldReturnEmpty_WhenNotFound() {
+        // Arrange
+        when(reviewRepository.findById(404L)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<Review> result = reviewQueryService.handle(new GetReviewByIdQuery(404L));
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(reviewRepository, times(1)).findById(404L);
+    }
 }

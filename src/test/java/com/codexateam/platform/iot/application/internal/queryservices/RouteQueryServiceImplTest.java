@@ -70,4 +70,48 @@ public class RouteQueryServiceImplTest {
         assertThrows(RouteNotFoundException.class, () -> routeQueryService.handle(query));
         verify(openRouteServiceApiClient, times(1)).isConfigured();
     }
+
+    @Test
+    @DisplayName("handle(GetRouteQuery) throws RouteNotFoundException when empty coordinates returned (AAA)")
+    void handle_GetRouteQuery_ShouldThrowException_WhenCoordinatesEmpty() {
+        // Arrange
+        var query = new GetRouteQuery(-12.0, -77.0, -12.1, -77.1);
+        when(openRouteServiceApiClient.isConfigured()).thenReturn(true);
+        when(openRouteServiceApiClient.getRouteCoordinates(-12.0, -77.0, -12.1, -77.1)).thenReturn(List.of());
+
+        // Act & Assert
+        assertThrows(RouteNotFoundException.class, () -> routeQueryService.handle(query));
+    }
+
+    @Test
+    @DisplayName("handle(GetCompleteRouteQuery) returns RouteResponse when configured and valid (AAA)")
+    void handle_GetCompleteRouteQuery_ShouldReturnRouteResponse() {
+        // Arrange
+        var query = new GetCompleteRouteQuery(-12.0, -77.0, -12.1, -77.1);
+        List<double[]> coords = List.of(new double[]{-12.0, -77.0}, new double[]{-12.1, -77.1});
+        var mockResponse = new RouteResponse(coords, 15000.0, 1200.0);
+
+        when(openRouteServiceApiClient.isConfigured()).thenReturn(true);
+        when(openRouteServiceApiClient.getCompleteRoute(-12.0, -77.0, -12.1, -77.1)).thenReturn(mockResponse);
+
+        // Act
+        RouteResponse result = routeQueryService.handle(query);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(15000.0, result.getDistanceMeters());
+        assertEquals(1200.0, result.getDurationSeconds());
+        assertEquals(2, result.getCoordinates().size());
+    }
+
+    @Test
+    @DisplayName("handle(GetRouteQuery) throws ValidationException when latitude exceeds 90 (AAA)")
+    void handle_GetRouteQuery_ShouldThrowValidationException_WhenLatitudeOutOfBounds() {
+        // Arrange
+        var query = new GetRouteQuery(95.0, -77.0, -12.0, -77.0);
+
+        // Act & Assert
+        assertThrows(ValidationException.class, () -> routeQueryService.handle(query));
+        verifyNoInteractions(openRouteServiceApiClient);
+    }
 }

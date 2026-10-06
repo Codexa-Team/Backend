@@ -29,4 +29,20 @@ public class SignUpCommandFromResourceAssemblerTest {
         assertEquals("Password123!", command.password());
         assertEquals(roles, command.roles());
     }
+
+    @Test
+    @DisplayName("toCommandFromResource with empty roles set produces command with empty roles (AAA)")
+    void toCommandFromResource_WithEmptyRoles_ShouldTransformCorrectly() {
+        // Arrange
+        var resource = new SignUpResource("Estefano", "estefano@renticar.com", "Password123!", "arrendador");
+        Set<Role> roles = Set.of();
+
+        // Act
+        var command = SignUpCommandFromResourceAssembler.toCommandFromResource(resource, roles);
+
+        // Assert
+        assertNotNull(command);
+        assertEquals("Estefano", command.name());
+        assertTrue(command.roles().isEmpty());
+    }
 }

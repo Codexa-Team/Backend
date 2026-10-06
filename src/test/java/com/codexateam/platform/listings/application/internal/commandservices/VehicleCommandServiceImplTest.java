@@ -172,4 +172,108 @@ public class VehicleCommandServiceImplTest {
         verify(telemetryRepository, times(1)).deleteByVehicleId(12L);
         verify(vehicleRepository, times(1)).deleteById(12L);
     }
+
+    @Test
+    @DisplayName("handle(DeleteVehicleCommand) should throw VehicleNotFoundException when vehicle does not exist (AAA)")
+    void handle_DeleteVehicleCommand_ShouldThrowException_WhenVehicleDoesNotExist() {
+        // Arrange
+        var command = new DeleteVehicleCommand(999L);
+        when(vehicleRepository.existsById(999L)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(VehicleNotFoundException.class, () -> vehicleCommandService.handle(command));
+        verify(vehicleRepository, times(1)).existsById(999L);
+        verify(vehicleRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("handle(CreateVehicleCommand) should return empty Optional when repository save throws exception (AAA)")
+    void handle_CreateVehicleCommand_ShouldReturnEmpty_WhenRepositorySaveFails() {
+        // Arrange
+        byte[] imageBytes = new byte[]{1, 2, 3};
+        var command = new CreateVehicleCommand("Toyota", "Yaris", 2021, 35.0, imageBytes, 1L);
+        when(externalIamService.isOwner(1L)).thenReturn(true);
+        when(vehicleRepository.save(any(Vehicle.class))).thenThrow(new RuntimeException("Database error"));
+
+        // Act
+        Optional<Vehicle> result = vehicleCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(vehicleRepository, times(1)).save(any(Vehicle.class));
+    }
+
+    @Test
+    @DisplayName("handle(UpdateVehicleStatusCommand) should return empty Optional when vehicle does not exist (AAA)")
+    void handle_UpdateVehicleStatusCommand_ShouldReturnEmpty_WhenVehicleNotFound() {
+        // Arrange
+        var command = new UpdateVehicleStatusCommand(999L, "rented");
+        when(vehicleRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<Vehicle> result = vehicleCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(vehicleRepository, times(1)).findById(999L);
+        verify(vehicleRepository, never()).save(any(Vehicle.class));
+    }
+
+    @Test
+    @DisplayName("handle(UpdateVehicleStatusCommand) should return empty Optional when repository save throws exception (AAA)")
+    void handle_UpdateVehicleStatusCommand_ShouldReturnEmpty_WhenSaveThrowsException() {
+        // Arrange
+        byte[] imageBytes = new byte[]{1, 2, 3};
+        var vehicle = new Vehicle(new CreateVehicleCommand("Nissan", "Versa", 2020, 40.0, imageBytes, 1L));
+        var command = new UpdateVehicleStatusCommand(1L, "rented");
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
+        when(vehicleRepository.save(any(Vehicle.class))).thenThrow(new RuntimeException("DB error"));
+
+        // Act
+        Optional<Vehicle> result = vehicleCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(vehicleRepository, times(1)).save(any(Vehicle.class));
+    }
+
+    @Test
+    @DisplayName("handle(UpdateVehicleCommand) should retain original image when new image is empty (AAA)")
+    void handle_UpdateVehicleCommand_ShouldRetainOriginalImage_WhenNewImageIsEmpty() {
+        // Arrange
+        byte[] originalImage = new byte[]{9, 8, 7};
+        byte[] emptyImage = new byte[]{};
+        var vehicle = new Vehicle(new CreateVehicleCommand("Audi", "A4", 2021, 80.0, originalImage, 1L));
+        var command = new UpdateVehicleCommand(1L, "Audi", "A4 Updated", 2022, 85.0, emptyImage);
+
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
+        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Vehicle> result = vehicleCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("A4 Updated", result.get().getModel());
+        assertArrayEquals(originalImage, result.get().getImage());
+        verify(vehicleRepository, times(1)).save(vehicle);
+    }
+
+    @Test
+    @DisplayName("handle(CreateVehicleCommand) should set default status to available (AAA)")
+    void handle_CreateVehicleCommand_ShouldSetDefaultStatusToAvailable() {
+        // Arrange
+        byte[] imageBytes = new byte[]{1, 2, 3};
+        var command = new CreateVehicleCommand("Chevrolet", "Onix", 2022, 38.0, imageBytes, 2L);
+        when(externalIamService.isOwner(2L)).thenReturn(true);
+        when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Optional<Vehicle> result = vehicleCommandService.handle(command);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals("available", result.get().getStatus());
+        verify(vehicleRepository, times(1)).save(any(Vehicle.class));
+    }
 }
