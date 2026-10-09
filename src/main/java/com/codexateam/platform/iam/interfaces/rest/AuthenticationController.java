@@ -79,7 +79,7 @@ public class AuthenticationController {
                     .orElseThrow(() -> new RuntimeException("Error creating user"));
             var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userResource);
-        } catch (IllegalArgumentException ex) {
+        } catch (com.codexateam.platform.iam.domain.exceptions.UserAlreadyExistsException | IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
@@ -103,7 +103,9 @@ public class AuthenticationController {
             var token = tokenService.generateToken(user.getEmailAddress().value());
             var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(user, token);
             return ResponseEntity.ok(authenticatedUserResource);
-        } catch (IllegalArgumentException ex) {
+        } catch (com.codexateam.platform.iam.domain.exceptions.UserNotFoundException
+                | com.codexateam.platform.iam.domain.exceptions.InvalidPasswordException
+                | IllegalArgumentException ex) {
             var body = java.util.Map.of("error", ERROR_INVALID_CREDENTIALS);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
         }
