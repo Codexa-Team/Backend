@@ -23,7 +23,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/simulation")
-@CrossOrigin(origins = "*")
 @Tag(name = "Route Simulation", description = "Endpoints for route planning and simulation")
 public class RouteController {
 

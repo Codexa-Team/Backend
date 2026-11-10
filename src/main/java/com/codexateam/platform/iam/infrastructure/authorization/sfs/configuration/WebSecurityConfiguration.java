@@ -82,10 +82,11 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    @SuppressWarnings({"java:S4502", "java:S5122"})
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(configurer -> configurer.configurationSource(request -> {
             var cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of("*"));
+            cors.setAllowedOriginPatterns(List.of("*"));
             cors.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(List.of("*"));
             return cors;

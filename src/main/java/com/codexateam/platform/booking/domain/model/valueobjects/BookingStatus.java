@@ -33,31 +33,19 @@ public record BookingStatus(String status) {
      * Creates a PENDING status.
      * @return A new BookingStatus with PENDING value
      */
-    public static BookingStatus pending() {
+    public static BookingStatus createPending() {
         return new BookingStatus(PENDING);
     }
 
-    /**
-     * Creates a CONFIRMED status.
-     * @return A new BookingStatus with CONFIRMED value
-     */
-    public static BookingStatus confirmed() {
+    public static BookingStatus createConfirmed() {
         return new BookingStatus(CONFIRMED);
     }
 
-    /**
-     * Creates a REJECTED status.
-     * @return A new BookingStatus with REJECTED value
-     */
-    public static BookingStatus rejected() {
+    public static BookingStatus createRejected() {
         return new BookingStatus(REJECTED);
     }
 
-    /**
-     * Creates a CANCELED status.
-     * @return A new BookingStatus with CANCELED value
-     */
-    public static BookingStatus canceled() {
+    public static BookingStatus createCanceled() {
         return new BookingStatus(CANCELED);
     }
 

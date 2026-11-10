@@ -79,7 +79,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
         this.startDate = command.startDate();
         this.endDate = command.endDate();
         this.totalPrice = calculatedPrice;
-        this.bookingStatus = BookingStatus.pending(); // Default status on creation
+        this.bookingStatus = BookingStatus.createPending();
     }
 
     /**
@@ -87,7 +87,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
      * Changes the status to "CONFIRMED".
      */
     public void confirm() {
-        this.bookingStatus = BookingStatus.confirmed();
+        this.bookingStatus = BookingStatus.createConfirmed();
     }
 
     /**
@@ -95,7 +95,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
      * Changes the status to "REJECTED".
      */
     public void reject() {
-        this.bookingStatus = BookingStatus.rejected();
+        this.bookingStatus = BookingStatus.createRejected();
     }
 
     /**
@@ -103,7 +103,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
      * Changes the status to "CANCELED".
      */
     public void cancel() {
-        this.bookingStatus = BookingStatus.canceled();
+        this.bookingStatus = BookingStatus.createCanceled();
     }
 
     /**
