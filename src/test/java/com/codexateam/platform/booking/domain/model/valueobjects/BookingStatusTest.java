@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BookingStatusTest {
 
     @Test
-    @DisplayName("BookingStatus.pending() creates status with PENDING value (AAA)")
+    @DisplayName("BookingStatus.createPending() creates status with PENDING value (AAA)")
     void factory_pending_ShouldCreatePendingStatus() {
         // Arrange & Act
-        BookingStatus status = BookingStatus.pending();
+        BookingStatus status = BookingStatus.createPending();
 
         // Assert
         assertEquals("PENDING", status.status());
@@ -25,10 +25,10 @@ public class BookingStatusTest {
     }
 
     @Test
-    @DisplayName("BookingStatus.confirmed() creates status with CONFIRMED value (AAA)")
+    @DisplayName("BookingStatus.createConfirmed() creates status with CONFIRMED value (AAA)")
     void factory_confirmed_ShouldCreateConfirmedStatus() {
         // Arrange & Act
-        BookingStatus status = BookingStatus.confirmed();
+        BookingStatus status = BookingStatus.createConfirmed();
 
         // Assert
         assertEquals("CONFIRMED", status.status());
@@ -38,10 +38,10 @@ public class BookingStatusTest {
     }
 
     @Test
-    @DisplayName("BookingStatus.rejected() creates status with REJECTED value (AAA)")
+    @DisplayName("BookingStatus.createRejected() creates status with REJECTED value (AAA)")
     void factory_rejected_ShouldCreateRejectedStatus() {
         // Arrange & Act
-        BookingStatus status = BookingStatus.rejected();
+        BookingStatus status = BookingStatus.createRejected();
 
         // Assert
         assertEquals("REJECTED", status.status());
@@ -50,10 +50,10 @@ public class BookingStatusTest {
     }
 
     @Test
-    @DisplayName("BookingStatus.canceled() creates status with CANCELED value (AAA)")
+    @DisplayName("BookingStatus.createCanceled() creates status with CANCELED value (AAA)")
     void factory_canceled_ShouldCreateCanceledStatus() {
         // Arrange & Act
-        BookingStatus status = BookingStatus.canceled();
+        BookingStatus status = BookingStatus.createCanceled();
 
         // Assert
         assertEquals("CANCELED", status.status());
@@ -83,8 +83,8 @@ public class BookingStatusTest {
     void equalsAndHashCode_WhenSameStatus_ShouldBeEqual() {
         // Arrange
         BookingStatus s1 = new BookingStatus("PENDING");
-        BookingStatus s2 = BookingStatus.pending();
-        BookingStatus s3 = BookingStatus.confirmed();
+        BookingStatus s2 = BookingStatus.createPending();
+        BookingStatus s3 = BookingStatus.createConfirmed();
 
         // Act & Assert
         assertEquals(s1, s2);
