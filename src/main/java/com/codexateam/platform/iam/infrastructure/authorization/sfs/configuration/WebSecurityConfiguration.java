@@ -108,6 +108,8 @@ public class WebSecurityConfiguration {
                                 "/api/v1/vehicles",
                                 "/api/v1/vehicles/**",
                                 "/api/v1/reviews/vehicle/**").permitAll()
+                        .requestMatchers(HttpMethod.HEAD,
+                                "/api/v1/vehicles/**").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);
