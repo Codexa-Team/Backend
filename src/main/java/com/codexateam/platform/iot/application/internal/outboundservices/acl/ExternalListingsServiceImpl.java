@@ -4,9 +4,8 @@ import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery
 import com.codexateam.platform.listings.domain.services.VehicleQueryService;
 import com.codexateam.platform.listings.interfaces.rest.resources.VehicleResource;
 import com.codexateam.platform.listings.interfaces.rest.transform.VehicleResourceFromEntityAssembler;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of ExternalListingsService ACL for IoT context.

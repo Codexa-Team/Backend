@@ -1,6 +1,9 @@
 package com.codexateam.platform.iam.interfaces.rest;
 
 import com.codexateam.platform.iam.application.internal.outboundservices.tokens.TokenService;
+import com.codexateam.platform.iam.domain.exceptions.InvalidPasswordException;
+import com.codexateam.platform.iam.domain.exceptions.UserAlreadyExistsException;
+import com.codexateam.platform.iam.domain.exceptions.UserNotFoundException;
 import com.codexateam.platform.iam.domain.model.queries.GetRoleByNameQuery;
 import com.codexateam.platform.iam.domain.model.valueobjects.Roles;
 import com.codexateam.platform.iam.domain.services.RoleQueryService;
@@ -16,6 +19,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +29,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * REST Controller for authentication endpoints (Sign-Up, Sign-In).
@@ -44,7 +47,17 @@ public class AuthenticationController {
     private final RoleQueryService roleQueryService;
     private final TokenService tokenService;
 
-    public AuthenticationController(UserCommandService userCommandService, RoleQueryService roleQueryService, TokenService tokenService) {
+    /**
+     * Creates an authentication controller.
+     *
+     * @param userCommandService user command service
+     * @param roleQueryService role query service
+     * @param tokenService JWT token service
+     */
+    public AuthenticationController(
+            UserCommandService userCommandService,
+            RoleQueryService roleQueryService,
+            TokenService tokenService) {
         this.userCommandService = userCommandService;
         this.roleQueryService = roleQueryService;
         this.tokenService = tokenService;
@@ -52,6 +65,7 @@ public class AuthenticationController {
 
     /**
      * Registers a new user account.
+     *
      * @param resource sign-up payload
      * @return created user resource
      */
@@ -79,13 +93,14 @@ public class AuthenticationController {
                     .orElseThrow(() -> new RuntimeException("Error creating user"));
             var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userResource);
-        } catch (com.codexateam.platform.iam.domain.exceptions.UserAlreadyExistsException | IllegalArgumentException ex) {
+        } catch (UserAlreadyExistsException | IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
     /**
      * Authenticates a user and returns a JWT token.
+     *
      * @param resource sign-in payload
      * @return authenticated user resource (with token) or 401
      */
@@ -101,37 +116,37 @@ public class AuthenticationController {
             var user = userCommandService.handle(command)
                     .orElseThrow(() -> new IllegalArgumentException(ERROR_INVALID_CREDENTIALS));
             var token = tokenService.generateToken(user.getEmailAddress().value());
-            var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(user, token);
+            var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler
+                    .toResourceFromEntity(user, token);
             return ResponseEntity.ok(authenticatedUserResource);
-        } catch (com.codexateam.platform.iam.domain.exceptions.UserNotFoundException
-                | com.codexateam.platform.iam.domain.exceptions.InvalidPasswordException
-                | IllegalArgumentException ex) {
-            var body = java.util.Map.of("error", ERROR_INVALID_CREDENTIALS);
+        } catch (UserNotFoundException | InvalidPasswordException | IllegalArgumentException ex) {
+            var body = Map.of("error", ERROR_INVALID_CREDENTIALS);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
         }
     }
 
     /**
      * Informational endpoint listing authentication operations.
+     *
      * @return map with endpoint info
      */
     @GetMapping
     public Map<String, Object> info() {
-        var response = new java.util.HashMap<String, Object>();
+        var response = new HashMap<String, Object>();
         response.put("message", "Authentication API");
         response.put("note", "Use POST for sign-up and sign-in. This GET is informational.");
-        var endpoints = new java.util.HashMap<String, String>();
+        var endpoints = new HashMap<String, String>();
         endpoints.put("signUp", "POST /api/v1/authentication/sign-up");
         endpoints.put("signIn", "POST /api/v1/authentication/sign-in");
         response.put("endpoints", endpoints);
-        var examples = new java.util.HashMap<String, Object>();
-        examples.put("signUpBody", java.util.Map.of(
+        var examples = new HashMap<String, Object>();
+        examples.put("signUpBody", Map.of(
                 "name", "John Doe",
                 "email", "john@example.com",
                 "password", "yourPassword",
                 "role", ROLE_ARRENDADOR_STRING + "|" + ROLE_ARRENDATARIO_STRING
         ));
-        examples.put("signInBody", java.util.Map.of(
+        examples.put("signInBody", Map.of(
                 "email", "john@example.com",
                 "password", "yourPassword"
         ));

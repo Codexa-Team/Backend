@@ -13,6 +13,11 @@ public record EmailAddress(@Column(name = "email", length = 50, nullable = false
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Validates non-blank, length-bounded email syntax on construction.
+     *
+     * @param value raw email string
+     */
     public EmailAddress {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Email address cannot be null or blank");

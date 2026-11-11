@@ -5,9 +5,8 @@ import com.codexateam.platform.iam.domain.model.entities.Role;
 import com.codexateam.platform.iam.domain.model.valueobjects.Roles;
 import com.codexateam.platform.iam.domain.services.RoleCommandService;
 import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.Arrays;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of RoleCommandService.

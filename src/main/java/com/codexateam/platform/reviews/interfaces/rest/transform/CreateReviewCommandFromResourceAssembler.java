@@ -9,6 +9,7 @@ import com.codexateam.platform.reviews.interfaces.rest.resources.CreateReviewRes
 public class CreateReviewCommandFromResourceAssembler {
     /**
      * Converts a CreateReviewResource DTO to a CreateReviewCommand.
+     *
      * @param resource The input DTO.
      * @param renterId The ID of the authenticated renter (from security context).
      * @return The CreateReviewCommand.

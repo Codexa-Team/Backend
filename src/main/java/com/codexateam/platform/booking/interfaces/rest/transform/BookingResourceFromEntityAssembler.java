@@ -9,6 +9,7 @@ import com.codexateam.platform.booking.interfaces.rest.resources.BookingResource
 public class BookingResourceFromEntityAssembler {
     /**
      * Converts a Booking entity to a BookingResource DTO.
+     *
      * @param entity The Booking aggregate to convert
      * @return The BookingResource DTO
      */

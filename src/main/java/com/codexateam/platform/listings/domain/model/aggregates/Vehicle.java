@@ -4,8 +4,8 @@ import com.codexateam.platform.listings.domain.model.commands.CreateVehicleComma
 import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
 import com.codexateam.platform.listings.domain.model.valueobjects.VehicleStatus;
 import com.codexateam.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
@@ -55,6 +55,7 @@ public class Vehicle extends AuditableAbstractAggregateRoot<Vehicle> {
     @Column(nullable = false)
     private Long ownerId;
 
+    /** Initializes a vehicle aggregate from a creation command with available status. */
     public Vehicle(CreateVehicleCommand command) {
         this.brand = command.brand();
         this.model = command.model();
@@ -64,9 +65,10 @@ public class Vehicle extends AuditableAbstractAggregateRoot<Vehicle> {
         this.image = command.image();
         this.ownerId = command.ownerId();
     }
-    
+
     /**
      * Updates the status of the vehicle.
+     *
      * @param newStatus The new status (e.g., "rented").
      */
     public void updateStatus(String newStatus) {
@@ -76,6 +78,7 @@ public class Vehicle extends AuditableAbstractAggregateRoot<Vehicle> {
     /**
      * Updates the vehicle's information with values from the UpdateVehicleCommand.
      * Only updates the image if the command contains valid image data (not null and not empty).
+     *
      * @param command The command containing the updated vehicle data.
      */
     public void update(UpdateVehicleCommand command) {
@@ -91,7 +94,10 @@ public class Vehicle extends AuditableAbstractAggregateRoot<Vehicle> {
 
     /**
      * Returns the vehicle's status as a string.
+     *
      * @return The status value or null if status is not set.
      */
-    public String getStatus() { return status != null ? status.value() : null; }
+    public String getStatus() {
+        return status != null ? status.value() : null;
+    }
 }

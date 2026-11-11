@@ -2,7 +2,14 @@ package com.codexateam.platform.iam.domain.model.entities;
 
 import com.codexateam.platform.iam.domain.model.valueobjects.Roles;
 import com.codexateam.platform.shared.domain.model.entities.AuditableModel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +43,7 @@ public class Role extends AuditableModel {
 
     /**
      * Gets the role name as a string.
+     *
      * @return The string representation of the role enum.
      */
     public String getStringName() {

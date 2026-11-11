@@ -2,6 +2,7 @@ package com.codexateam.platform.iam.interfaces.rest.resources;
 
 /**
  * DTO for profile update (name, email).
+ *
  * @param name new full name
  * @param email new email
  */

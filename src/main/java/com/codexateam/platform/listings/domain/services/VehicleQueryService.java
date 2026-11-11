@@ -4,7 +4,6 @@ import com.codexateam.platform.listings.domain.model.aggregates.Vehicle;
 import com.codexateam.platform.listings.domain.model.queries.GetAllVehiclesQuery;
 import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery;
 import com.codexateam.platform.listings.domain.model.queries.GetVehiclesByOwnerIdQuery;
-
 import java.util.List;
 import java.util.Optional;
 

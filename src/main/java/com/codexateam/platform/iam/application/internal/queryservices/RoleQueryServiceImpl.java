@@ -5,10 +5,9 @@ import com.codexateam.platform.iam.domain.model.queries.GetAllRolesQuery;
 import com.codexateam.platform.iam.domain.model.queries.GetRoleByNameQuery;
 import com.codexateam.platform.iam.domain.services.RoleQueryService;
 import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of RoleQueryService.

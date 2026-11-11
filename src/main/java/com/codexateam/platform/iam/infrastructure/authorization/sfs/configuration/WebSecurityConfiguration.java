@@ -3,6 +3,7 @@ package com.codexateam.platform.iam.infrastructure.authorization.sfs.configurati
 import com.codexateam.platform.iam.application.internal.outboundservices.hashing.HashingService;
 import com.codexateam.platform.iam.application.internal.outboundservices.tokens.TokenService;
 import com.codexateam.platform.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +22,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
-
 /**
  * Main Spring Security configuration class.
  * Configures CORS, CSRF, session management, and authorization rules.
@@ -37,26 +36,54 @@ public class WebSecurityConfiguration {
     private final HashingService hashingService;
     private final AuthenticationEntryPoint unauthorizedRequestHandler;
 
-    public WebSecurityConfiguration(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
-                                    TokenService tokenService,
-                                    HashingService hashingService,
-                                    @Qualifier("unauthorizedRequestHandlerEntryPoint") AuthenticationEntryPoint unauthorizedRequestHandler) {
+    /**
+     * Creates security configuration with required user details, token, hashing, and entry point beans.
+     *
+     * @param userDetailsService user details loader
+     * @param tokenService JWT token service
+     * @param hashingService password encoder service
+     * @param unauthorizedRequestHandler handler for unauthorized requests
+     */
+    public WebSecurityConfiguration(
+            @Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService,
+            TokenService tokenService,
+            HashingService hashingService,
+            @Qualifier("unauthorizedRequestHandlerEntryPoint")
+            AuthenticationEntryPoint unauthorizedRequestHandler) {
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
         this.hashingService = hashingService;
         this.unauthorizedRequestHandler = unauthorizedRequestHandler;
     }
 
+    /**
+     * Registers the JWT bearer authorization filter bean.
+     *
+     * @return configured {@link BearerAuthorizationRequestFilter}
+     */
     @Bean
     public BearerAuthorizationRequestFilter authorizationRequestFilter() {
         return new BearerAuthorizationRequestFilter(tokenService, userDetailsService);
     }
 
+    /**
+     * Exposes the Spring {@link AuthenticationManager} bean.
+     *
+     * @param authenticationConfiguration Spring authentication configuration
+     * @return authentication manager instance
+     * @throws Exception if retrieval fails
+     */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    /**
+     * Configures DAO authentication provider backed by custom user details and password encoder.
+     *
+     * @return configured {@link DaoAuthenticationProvider}
+     */
     @Bean
     @SuppressWarnings("deprecation")
     public DaoAuthenticationProvider authenticationProvider() {
@@ -66,6 +93,11 @@ public class WebSecurityConfiguration {
         return authenticationProvider;
     }
 
+    /**
+     * Adapts {@link HashingService} to Spring Security's {@link PasswordEncoder}.
+     *
+     * @return password encoder delegating to the hashing service
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new PasswordEncoder() {
@@ -81,6 +113,13 @@ public class WebSecurityConfiguration {
         };
     }
 
+    /**
+     * Builds the HTTP security filter chain with stateless JWT authentication and CORS policy.
+     *
+     * @param http HTTP security builder
+     * @return configured security filter chain
+     * @throws Exception if configuration fails
+     */
     @Bean
     @SuppressWarnings({"java:S4502", "java:S5122"})
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -92,18 +131,20 @@ public class WebSecurityConfiguration {
             return cors;
         }));
         http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
-                .sessionManagement( customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
+                .sessionManagement(customizer ->
+                        customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
-                                "/api/v1/authentication/**", // Public auth endpoints
+                                "/api/v1/authentication/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/error",
-                                "/").permitAll() // Welcome endpoint is public
+                                "/").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/vehicles",
                                 "/api/v1/vehicles/**",

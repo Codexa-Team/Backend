@@ -1,22 +1,20 @@
 package com.codexateam.platform.booking.application.internal.queryservices;
 
+import com.codexateam.platform.booking.domain.exceptions.BookingNotFoundException;
 import com.codexateam.platform.booking.domain.model.aggregates.Booking;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingByIdQuery;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingByVehicleIdAndDateQuery;
 import com.codexateam.platform.booking.domain.model.queries.GetBookingsByOwnerIdQuery;
 import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
-import com.codexateam.platform.booking.domain.model.queries.GetBookingByVehicleIdAndDateQuery;
-import com.codexateam.platform.booking.domain.model.queries.GetBookingByIdQuery;
 import com.codexateam.platform.booking.domain.services.BookingQueryService;
 import com.codexateam.platform.booking.infrastructure.persistence.jpa.repositories.BookingRepository;
-import com.codexateam.platform.booking.domain.exceptions.BookingNotFoundException;
-import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
- * Implementation of BookingQueryService.
- * Handles all booking-related queries following CQRS pattern.
+ * Implementation of {@link BookingQueryService} handling booking read queries.
  */
 @Service
 public class BookingQueryServiceImpl implements BookingQueryService {
@@ -29,6 +27,7 @@ public class BookingQueryServiceImpl implements BookingQueryService {
 
     /**
      * Retrieves all bookings made by a specific renter.
+     *
      * @param query The query containing the renter ID
      * @return List of bookings made by the renter
      */
@@ -39,6 +38,7 @@ public class BookingQueryServiceImpl implements BookingQueryService {
 
     /**
      * Retrieves all bookings associated with vehicles owned by a specific owner.
+     *
      * @param query The query containing the owner ID
      * @return List of bookings for the owner's vehicles
      */
@@ -49,17 +49,21 @@ public class BookingQueryServiceImpl implements BookingQueryService {
 
     /**
      * Finds a booking for a specific vehicle that includes the given timestamp.
+     *
      * @param query The query containing vehicle ID and timestamp
      * @return An Optional containing the booking if found, empty otherwise
      */
     @Override
     public Optional<Booking> handle(GetBookingByVehicleIdAndDateQuery query) {
         Date t = query.timestamp();
-        return bookingRepository.findFirstByVehicleIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(query.vehicleId(), t, t);
+        return bookingRepository
+                .findFirstByVehicleIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                        query.vehicleId(), t, t);
     }
 
     /**
      * Retrieves a booking by its unique identifier.
+     *
      * @param query The query containing the booking ID
      * @return An Optional containing the booking if found
      * @throws BookingNotFoundException if the booking does not exist

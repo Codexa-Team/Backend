@@ -35,6 +35,7 @@ public class Review extends AuditableAbstractAggregateRoot<Review> {
     @Column(length = 2000)
     private String comment;
 
+    /** Initializes a review aggregate from a creation command. */
     public Review(CreateReviewCommand command) {
         this.vehicleId = command.vehicleId();
         this.renterId = command.renterId();

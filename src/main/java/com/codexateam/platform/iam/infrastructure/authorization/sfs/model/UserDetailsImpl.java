@@ -1,14 +1,13 @@
 package com.codexateam.platform.iam.infrastructure.authorization.sfs.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.codexateam.platform.iam.domain.model.aggregates.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * A custom UserDetails implementation that wraps the User aggregate.
@@ -22,7 +21,21 @@ public class UserDetailsImpl implements UserDetails {
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String name, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    /**
+     * Creates an immutable {@link UserDetailsImpl} backed by domain user credentials.
+     *
+     * @param id user ID
+     * @param name user's full name
+     * @param email user's email address
+     * @param password encoded password hash
+     * @param authorities granted Spring Security authorities
+     */
+    public UserDetailsImpl(
+            Long id,
+            String name,
+            String email,
+            String password,
+            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -32,6 +45,7 @@ public class UserDetailsImpl implements UserDetails {
 
     /**
      * Factory method to build a UserDetailsImpl from a User aggregate.
+     *
      * @param user The User aggregate.
      * @return A UserDetailsImpl instance.
      */
@@ -39,7 +53,12 @@ public class UserDetailsImpl implements UserDetails {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getStringName()))
                 .collect(Collectors.toList());
-        return new UserDetailsImpl(user.getId(), user.getName(), user.getEmailAddress().value(), user.getPassword(), authorities);
+        return new UserDetailsImpl(
+                user.getId(),
+                user.getName(),
+                user.getEmailAddress().value(),
+                user.getPassword(),
+                authorities);
     }
 
     @Override

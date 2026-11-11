@@ -8,12 +8,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * REST Controller for managing roles.
@@ -32,6 +31,7 @@ public class RolesController {
 
     /**
      * Retrieves all available roles in the system.
+     *
      * @return list of role resources
      */
     @Operation(summary = "Get All Roles", description = "Get a list of all available roles in the system")

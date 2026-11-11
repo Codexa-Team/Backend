@@ -1,4 +1,5 @@
 package com.codexateam.platform.iot.domain.exceptions;
+
 import com.codexateam.platform.shared.domain.exceptions.ResourceNotFoundException;
 
 /**
@@ -8,6 +9,7 @@ import com.codexateam.platform.shared.domain.exceptions.ResourceNotFoundExceptio
 public class VehicleNotFoundException extends ResourceNotFoundException {
     /**
      * Constructs a new VehicleNotFoundException with the vehicle ID.
+     *
      * @param vehicleId The ID of the vehicle that was not found
      */
     public VehicleNotFoundException(Long vehicleId) {

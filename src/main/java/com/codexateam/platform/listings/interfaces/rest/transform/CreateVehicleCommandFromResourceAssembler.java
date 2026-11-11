@@ -16,7 +16,8 @@ public class CreateVehicleCommandFromResourceAssembler {
      * @param ownerId The ID of the authenticated owner.
      * @return The CreateVehicleCommand.
      */
-    public static CreateVehicleCommand toCommandFromResource(CreateVehicleResource resource, byte[] image, Long ownerId) {
+    public static CreateVehicleCommand toCommandFromResource(
+            CreateVehicleResource resource, byte[] image, Long ownerId) {
         return new CreateVehicleCommand(
                 resource.brand(),
                 resource.model(),

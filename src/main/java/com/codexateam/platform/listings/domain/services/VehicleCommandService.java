@@ -2,10 +2,10 @@ package com.codexateam.platform.listings.domain.services;
 
 import com.codexateam.platform.listings.domain.model.aggregates.Vehicle;
 import com.codexateam.platform.listings.domain.model.commands.CreateVehicleCommand;
-import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleStatusCommand;
-import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
-import java.util.Optional;
 import com.codexateam.platform.listings.domain.model.commands.DeleteVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleStatusCommand;
+import java.util.Optional;
 
 /**
  * Service interface for handling Vehicle commands.

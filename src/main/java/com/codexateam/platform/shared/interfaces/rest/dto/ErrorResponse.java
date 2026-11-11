@@ -2,7 +2,6 @@ package com.codexateam.platform.shared.interfaces.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,6 +34,7 @@ public class ErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 
+    /** Initializes a timestamped REST error response without validation field details. */
     public ErrorResponse(int status, String error, String message, String path) {
         this();
         this.status = status;

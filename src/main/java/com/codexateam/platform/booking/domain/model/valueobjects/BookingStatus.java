@@ -9,17 +9,18 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public record BookingStatus(String status) {
 
-    /** Initial status of a newly created booking */
+    /** Initial status of a newly created booking. */
     public static final String PENDING = "PENDING";
-    /** Status when the booking was confirmed by the owner */
+    /** Status when the booking was confirmed by the owner. */
     public static final String CONFIRMED = "CONFIRMED";
-    /** Status when the booking was rejected by the owner */
+    /** Status when the booking was rejected by the owner. */
     public static final String REJECTED = "REJECTED";
-    /** Status when the booking was canceled by the renter */
+    /** Status when the booking was canceled by the renter. */
     public static final String CANCELED = "CANCELED";
 
     /**
      * Default constructor that validates the status value.
+     *
      * @param status The status value to encapsulate
      * @throws IllegalArgumentException if status is null or invalid
      */
@@ -31,6 +32,7 @@ public record BookingStatus(String status) {
 
     /**
      * Creates a PENDING status.
+     *
      * @return A new BookingStatus with PENDING value
      */
     public static BookingStatus createPending() {
@@ -51,6 +53,7 @@ public record BookingStatus(String status) {
 
     /**
      * Checks if the status is PENDING.
+     *
      * @return true if status is PENDING
      */
     public boolean isPending() {
@@ -59,6 +62,7 @@ public record BookingStatus(String status) {
 
     /**
      * Checks if the status is CONFIRMED.
+     *
      * @return true if status is CONFIRMED
      */
     public boolean isConfirmed() {
@@ -67,6 +71,7 @@ public record BookingStatus(String status) {
 
     /**
      * Checks if the status is REJECTED.
+     *
      * @return true if status is REJECTED
      */
     public boolean isRejected() {
@@ -75,6 +80,7 @@ public record BookingStatus(String status) {
 
     /**
      * Checks if the status is CANCELED.
+     *
      * @return true if status is CANCELED
      */
     public boolean isCanceled() {
@@ -83,6 +89,7 @@ public record BookingStatus(String status) {
 
     /**
      * Checks if the booking is in an active state (PENDING or CONFIRMED).
+     *
      * @return true if status is PENDING or CONFIRMED
      */
     public boolean isActive() {
@@ -90,16 +97,22 @@ public record BookingStatus(String status) {
     }
 
     /**
-     * Compares the internal value with the provided one, ignoring case.
-     * @param other The value to compare with
-     * @return true if both values are equal ignoring case
-     */
-    public boolean equalsIgnoreCase(String other) { return status.equalsIgnoreCase(other); }
-
-    /**
      * Checks if the provided value represents an active state (PENDING or CONFIRMED).
+     *
      * @param value The value to check
      * @return true if the value represents an active state
      */
-    public static boolean isActive(String value) { return PENDING.equalsIgnoreCase(value) || CONFIRMED.equalsIgnoreCase(value); }
+    public static boolean isActive(String value) {
+        return PENDING.equalsIgnoreCase(value) || CONFIRMED.equalsIgnoreCase(value);
+    }
+
+    /**
+     * Compares the internal value with the provided one, ignoring case.
+     *
+     * @param other The value to compare with
+     * @return true if both values are equal ignoring case
+     */
+    public boolean equalsIgnoreCase(String other) {
+        return status.equalsIgnoreCase(other);
+    }
 }

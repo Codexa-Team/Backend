@@ -4,6 +4,7 @@ import java.util.Date;
 
 /**
  * Command to create a new booking.
+ *
  * @param vehicleId The ID of the vehicle being booked.
  * @param renterId The ID of the user (Arrendatario) making the booking.
  * @param ownerId The ID of the user (Arrendador) who owns the vehicle.

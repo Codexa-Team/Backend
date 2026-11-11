@@ -3,16 +3,15 @@ package com.codexateam.platform.iot.application.internal.queryservices;
 import com.codexateam.platform.iot.application.internal.outboundservices.acl.ExternalBookingService;
 import com.codexateam.platform.iot.application.internal.outboundservices.acl.ExternalListingsService;
 import com.codexateam.platform.iot.domain.model.aggregates.Telemetry;
-import com.codexateam.platform.iot.domain.model.queries.GetTelemetryByVehicleIdQuery;
 import com.codexateam.platform.iot.domain.model.queries.GetLatestTelemetryQuery;
+import com.codexateam.platform.iot.domain.model.queries.GetTelemetryByVehicleIdQuery;
 import com.codexateam.platform.iot.domain.services.TelemetryQueryService;
 import com.codexateam.platform.iot.infrastructure.persistence.jpa.repositories.TelemetryRepository;
 import com.codexateam.platform.shared.domain.exceptions.UnauthorizedAccessException;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of TelemetryQueryService.
@@ -27,6 +26,7 @@ public class TelemetryQueryServiceImpl implements TelemetryQueryService {
     private final ExternalListingsService externalListingsService;
     private final ExternalBookingService externalBookingService;
 
+    /** Initializes telemetry query service dependencies for data lookup and access checks. */
     public TelemetryQueryServiceImpl(
             TelemetryRepository telemetryRepository,
             ExternalListingsService externalListingsService,

@@ -1,8 +1,10 @@
 package com.codexateam.platform.listings.interfaces.rest;
 
 import com.codexateam.platform.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
-import com.codexateam.platform.listings.domain.exceptions.VehicleNotFoundException;
 import com.codexateam.platform.listings.domain.exceptions.OwnerNotFoundException;
+import com.codexateam.platform.listings.domain.exceptions.VehicleNotFoundException;
+import com.codexateam.platform.listings.domain.model.commands.DeleteVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
 import com.codexateam.platform.listings.domain.model.queries.GetAllVehiclesQuery;
 import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery;
 import com.codexateam.platform.listings.domain.model.queries.GetVehiclesByOwnerIdQuery;
@@ -12,24 +14,28 @@ import com.codexateam.platform.listings.interfaces.rest.resources.CreateVehicleR
 import com.codexateam.platform.listings.interfaces.rest.resources.VehicleResource;
 import com.codexateam.platform.listings.interfaces.rest.transform.CreateVehicleCommandFromResourceAssembler;
 import com.codexateam.platform.listings.interfaces.rest.transform.VehicleResourceFromEntityAssembler;
-import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
+import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
-
-import com.codexateam.platform.listings.domain.model.commands.DeleteVehicleCommand;
 
 /**
  * REST Controller for the Listings bounded context.
@@ -48,6 +54,7 @@ public class VehiclesController {
     private final VehicleQueryService vehicleQueryService;
     private final VehicleResourceFromEntityAssembler vehicleResourceFromEntityAssembler;
 
+    /** Initializes vehicle REST dependencies for listing commands, queries, and assembly. */
     public VehiclesController(VehicleCommandService vehicleCommandService,
                              VehicleQueryService vehicleQueryService,
                              VehicleResourceFromEntityAssembler vehicleResourceFromEntityAssembler) {
@@ -55,14 +62,16 @@ public class VehiclesController {
         this.vehicleQueryService = vehicleQueryService;
         this.vehicleResourceFromEntityAssembler = vehicleResourceFromEntityAssembler;
     }
-    
+
     /**
      * Extracts the authenticated user's ID from the security context.
+     *
      * @return the authenticated user ID
      */
     private Long getAuthenticatedUserId() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
             throw new SecurityException(ERROR_USER_NOT_AUTHENTICATED);
         }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -71,13 +80,16 @@ public class VehiclesController {
 
     /**
      * Creates a new vehicle listing (owner only).
+     *
      * @param resource payload containing vehicle attributes as JSON
      * @param image the vehicle image file
      * @return created vehicle resource with HTTP 201
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ROLE_ARRENDADOR')")
-    @Operation(summary = "Create Vehicle Listing", description = "Create a new vehicle listing as an owner (ROLE_ARRENDADOR)")
+    @Operation(
+            summary = "Create Vehicle Listing",
+            description = "Create a new vehicle listing as an owner (ROLE_ARRENDADOR)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Vehicle created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
@@ -89,7 +101,8 @@ public class VehiclesController {
         try {
             Long ownerId = getAuthenticatedUserId();
             byte[] imageBytes = image.getBytes();
-            var command = CreateVehicleCommandFromResourceAssembler.toCommandFromResource(resource, imageBytes, ownerId);
+            var command = CreateVehicleCommandFromResourceAssembler.toCommandFromResource(
+                    resource, imageBytes, ownerId);
             var vehicle = vehicleCommandService.handle(command)
                     .orElseThrow(() -> new RuntimeException(ERROR_CREATING_VEHICLE));
             var vehicleResource = vehicleResourceFromEntityAssembler.toResourceFromEntity(vehicle);
@@ -101,6 +114,7 @@ public class VehiclesController {
 
     /**
      * Retrieves all vehicles (public).
+     *
      * @return list of vehicle resources
      */
     @GetMapping
@@ -119,6 +133,7 @@ public class VehiclesController {
 
     /**
      * Retrieves a vehicle by ID (public).
+     *
      * @param vehicleId identifier of the vehicle
      * @return vehicle resource if found
      */
@@ -138,6 +153,7 @@ public class VehiclesController {
 
     /**
      * Retrieves the image of a vehicle by ID (public).
+     *
      * @param vehicleId identifier of the vehicle
      * @return the image as byte array
      */
@@ -164,11 +180,14 @@ public class VehiclesController {
 
     /**
      * Retrieves all vehicles owned by the authenticated owner.
+     *
      * @return list of owner's vehicle resources
      */
     @GetMapping("/my-listings")
     @PreAuthorize("hasRole('ROLE_ARRENDADOR')")
-    @Operation(summary = "Get Owner's Listings", description = "Get all vehicles listed by the authenticated owner (ROLE_ARRENDADOR)")
+    @Operation(
+            summary = "Get Owner's Listings",
+            description = "Get all vehicles listed by the authenticated owner (ROLE_ARRENDADOR)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Listings found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -185,6 +204,7 @@ public class VehiclesController {
 
     /**
      * Updates an existing vehicle listing (owner only).
+     *
      * @param vehicleId vehicle identifier
      * @param resource updated data as JSON
      * @param image the updated vehicle image file (optional)
@@ -224,6 +244,7 @@ public class VehiclesController {
 
     /**
      * Deletes a vehicle with cascade cleanup (owner only).
+     *
      * @param vehicleId vehicle identifier
      * @return empty 204 response
      */

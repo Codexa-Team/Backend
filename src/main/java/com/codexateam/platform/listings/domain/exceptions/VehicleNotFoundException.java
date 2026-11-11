@@ -8,6 +8,7 @@ import com.codexateam.platform.shared.domain.exceptions.DomainException;
 public class VehicleNotFoundException extends DomainException {
     /**
      * Constructs a VehicleNotFoundException with the missing vehicle ID.
+     *
      * @param id the vehicle ID not found
      */
     public VehicleNotFoundException(Long id) {

@@ -1,4 +1,5 @@
 package com.codexateam.platform.iot.domain.exceptions;
+
 import com.codexateam.platform.shared.domain.exceptions.ResourceNotFoundException;
 
 /**

@@ -5,6 +5,7 @@ import com.codexateam.platform.shared.domain.model.aggregates.AuditableAbstractA
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -58,7 +59,8 @@ public class Telemetry extends AuditableAbstractAggregateRoot<Telemetry> {
      * @param fuelLevel The current fuel level percentage (0-100)
      * @param timestamp The timestamp for this telemetry reading
      */
-    public void updateTelemetryData(Double latitude, Double longitude, Double speed, Double fuelLevel, java.util.Date timestamp) {
+    public void updateTelemetryData(
+            Double latitude, Double longitude, Double speed, Double fuelLevel, Date timestamp) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.speed = speed;

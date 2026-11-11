@@ -30,6 +30,7 @@ public interface SimulationCommandService {
      * @throws com.codexateam.platform.iot.domain.exceptions.VehicleNotFoundException if vehicle doesn't exist
      * @throws com.codexateam.platform.shared.domain.exceptions.UnauthorizedAccessException if user is not the owner
      */
-    void startCustomSimulation(Long vehicleId, Long userId, double startLat, double startLng, double endLat, double endLng);
+    void startCustomSimulation(
+            Long vehicleId, Long userId, double startLat, double startLng, double endLat, double endLng);
 }
 

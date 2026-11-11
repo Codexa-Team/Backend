@@ -1,15 +1,14 @@
 package com.codexateam.platform.reviews.application.internal.commandservices;
 
+import com.codexateam.platform.booking.interfaces.acl.BookingContextFacade;
+import com.codexateam.platform.reviews.domain.exceptions.CompletedBookingRequiredException;
+import com.codexateam.platform.reviews.domain.exceptions.ReviewAlreadyExistsException;
 import com.codexateam.platform.reviews.domain.model.aggregates.Review;
 import com.codexateam.platform.reviews.domain.model.commands.CreateReviewCommand;
 import com.codexateam.platform.reviews.domain.services.ReviewCommandService;
-import com.codexateam.platform.reviews.domain.exceptions.CompletedBookingRequiredException;
-import com.codexateam.platform.reviews.domain.exceptions.ReviewAlreadyExistsException;
 import com.codexateam.platform.reviews.infrastructure.persistence.jpa.repositories.ReviewRepository;
-import com.codexateam.platform.booking.interfaces.acl.BookingContextFacade;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of ReviewCommandService.

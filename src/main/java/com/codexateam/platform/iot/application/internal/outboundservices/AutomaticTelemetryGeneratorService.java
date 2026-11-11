@@ -1,10 +1,14 @@
 package com.codexateam.platform.iot.application.internal.outboundservices;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service for automatically generating telemetry data for active bookings.
@@ -28,7 +32,9 @@ public class AutomaticTelemetryGeneratorService {
      * @param vehicleId The ID of the vehicle being monitored
      */
     public void notifyActiveMonitoring(Long vehicleId) {
-        if (vehicleId == null) return;
+        if (vehicleId == null) {
+            return;
+        }
         lastHeartbeatMap.put(vehicleId, new Date());
     }
 
@@ -40,7 +46,9 @@ public class AutomaticTelemetryGeneratorService {
      */
     public List<double[]> getPlannedRoute(Long vehicleId) {
         Queue<double[]> queue = vehicleRoutes.get(vehicleId);
-        if (queue == null || queue.isEmpty()) return Collections.emptyList();
+        if (queue == null || queue.isEmpty()) {
+            return Collections.emptyList();
+        }
         return new ArrayList<>(queue);
     }
 }

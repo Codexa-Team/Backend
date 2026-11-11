@@ -6,5 +6,6 @@ package com.codexateam.platform.iam.application.internal.outboundservices.hashin
  */
 public interface HashingService {
     String encode(CharSequence rawPassword);
+
     boolean matches(CharSequence rawPassword, String encodedPassword);
 }

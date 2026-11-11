@@ -25,15 +25,23 @@ public record VehicleStatus(String value) {
      * @throws IllegalArgumentException if the status is null, blank, or invalid
      */
     public VehicleStatus {
-        if (value == null || value.isBlank()) throw new IllegalArgumentException("Vehicle status cannot be blank");
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Vehicle status cannot be blank");
+        }
         var normalized = value.toLowerCase();
-        if (!ALLOWED.contains(normalized)) throw new IllegalArgumentException("Invalid vehicle status: " + value);
+        if (!ALLOWED.contains(normalized)) {
+            throw new IllegalArgumentException("Invalid vehicle status: " + value);
+        }
         value = normalized;
     }
 
     /**
      * Returns the string representation of the vehicle status.
-     * @return
+     *
+     * @return Normalized lowercase vehicle status string.
      */
-    @Override public String toString() { return value; }
+    @Override
+    public String toString() {
+        return value;
+    }
 }

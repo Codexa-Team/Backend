@@ -2,7 +2,6 @@ package com.codexateam.platform.iot.interfaces.rest.transform;
 
 import com.codexateam.platform.iot.domain.model.aggregates.Telemetry;
 import com.codexateam.platform.iot.interfaces.rest.resources.TelemetryResource;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import java.util.List;
  * Declared as public to be accessible from controllers and services.
  */
 public class TelemetryResourceFromEntityAssembler {
+    /** Converts a Telemetry aggregate to a resource without a planned route. */
     public static TelemetryResource toResourceFromEntity(Telemetry entity) {
         return new TelemetryResource(
                 entity.getId(),
@@ -27,6 +27,7 @@ public class TelemetryResourceFromEntityAssembler {
 
     /**
      * Converts a Telemetry entity to a TelemetryResource DTO with planned route information.
+     *
      * @param entity The Telemetry entity to convert
      * @param plannedRoute The list of coordinate pairs representing the planned route
      * @return The TelemetryResource DTO with route information

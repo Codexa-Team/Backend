@@ -7,11 +7,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
 
 /**
  * Represents the Booking aggregate root in the Booking bounded context.
@@ -69,6 +68,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
 
     /**
      * Constructor for creating a new Booking.
+     *
      * @param command The CreateBookingCommand containing initial data.
      * @param calculatedPrice The calculated total price for the booking.
      */
@@ -108,6 +108,7 @@ public class Booking extends AuditableAbstractAggregateRoot<Booking> {
 
     /**
      * Gets the status value as a String.
+     *
      * @return The status value
      */
     public String getStatus() {

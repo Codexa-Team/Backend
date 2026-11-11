@@ -3,20 +3,17 @@ package com.codexateam.platform.booking.interfaces.acl;
 import com.codexateam.platform.booking.domain.model.aggregates.Booking;
 import com.codexateam.platform.booking.domain.model.queries.GetBookingByVehicleIdAndDateQuery;
 import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
-import com.codexateam.platform.booking.domain.services.BookingQueryService;
 import com.codexateam.platform.booking.domain.model.valueobjects.BookingStatus;
-import org.springframework.stereotype.Service;
-
+import com.codexateam.platform.booking.domain.services.BookingQueryService;
 import java.util.Date;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
+/**
+ * ACL Facade exposing Booking context operations without coupling callers to internal layers.
+ */
 @Service
 public class BookingContextFacade {
-
-    /**
-     * ACL Facade to expose Booking context operations to other bounded contexts
-     * without coupling them to internal layers (controllers, repositories).
-     */
 
     private final BookingQueryService bookingQueryService;
 
@@ -40,8 +37,8 @@ public class BookingContextFacade {
 
     /**
      * Checks if a renter has completed at least one booking for the specified vehicle.
-     * A booking is considered completed if its status is CANCELED, REJECTED, or CONFIRMED with an end date in the past.
-     * Used by the Reviews bounded context to verify that a user has rented the vehicle before posting a review.
+     * A booking counts as completed if status is CANCELED, REJECTED, or CONFIRMED with a past end date.
+     * Used by Reviews to confirm prior rental eligibility before publishing a review.
      *
      * @param renterId The ID of the renter.
      * @param vehicleId The ID of the vehicle.
@@ -52,9 +49,11 @@ public class BookingContextFacade {
         Date now = new Date();
         return bookings.stream().anyMatch(b ->
                 b.getVehicleId().equals(vehicleId) && (
-                        BookingStatus.CANCELED.equalsIgnoreCase(b.getStatus()) ||
-                        BookingStatus.REJECTED.equalsIgnoreCase(b.getStatus()) ||
-                        (BookingStatus.CONFIRMED.equalsIgnoreCase(b.getStatus()) && b.getEndDate() != null && b.getEndDate().before(now))
+                        BookingStatus.CANCELED.equalsIgnoreCase(b.getStatus())
+                        || BookingStatus.REJECTED.equalsIgnoreCase(b.getStatus())
+                        || (BookingStatus.CONFIRMED.equalsIgnoreCase(b.getStatus())
+                                && b.getEndDate() != null
+                                && b.getEndDate().before(now))
                 )
         );
     }

@@ -2,15 +2,21 @@ package com.codexateam.platform.iam.domain.model.aggregates;
 
 import com.codexateam.platform.iam.domain.model.entities.Role;
 import com.codexateam.platform.iam.domain.model.valueobjects.EmailAddress;
+import com.codexateam.platform.iam.domain.model.valueobjects.EmailAddressAttributeConverter;
 import com.codexateam.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import jakarta.persistence.*;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.HashSet;
 import java.util.Set;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Represents the User aggregate root in the IAM bounded context.
@@ -20,7 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Entity
-@Table(name = "users") // Matches 'db.json'
+@Table(name = "users")
 public class User extends AuditableAbstractAggregateRoot<User> {
 
     /**
@@ -31,8 +37,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Size(max = 100)
     private String name;
 
-    // Email as Value Object
-    @Convert(converter = com.codexateam.platform.iam.domain.model.valueobjects.EmailAddressAttributeConverter.class)
+    @Convert(converter = EmailAddressAttributeConverter.class)
     private EmailAddress email;
 
     /**
@@ -53,6 +58,13 @@ public class User extends AuditableAbstractAggregateRoot<User> {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    /**
+     * Creates a user with name, email address, and encoded password.
+     *
+     * @param name user's full name
+     * @param email user's email address
+     * @param password encoded password
+     */
     public User(String name, String email, String password) {
         this.name = name;
         this.email = new EmailAddress(email);
@@ -66,6 +78,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
 
     /**
      * Adds a role to the user's set of roles.
+     *
      * @param role The Role entity to add.
      * @return The current User instance.
      */
@@ -74,11 +87,23 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         return this;
     }
 
-    // Accessors replacing Lombok @Getter
-    public String getName() { return name; }
-    public EmailAddress getEmailAddress() { return email; }
-    public String getPassword() { return password; }
-    public Set<Role> getRoles() { return roles; }
+    public String getName() {
+        return name;
+    }
 
-    public void setEmail(String newEmail) { this.email = new EmailAddress(newEmail); }
+    public EmailAddress getEmailAddress() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setEmail(String newEmail) {
+        this.email = new EmailAddress(newEmail);
+    }
 }

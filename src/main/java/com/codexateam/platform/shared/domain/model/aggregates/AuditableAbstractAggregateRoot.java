@@ -1,13 +1,18 @@
 package com.codexateam.platform.shared.domain.model.aggregates;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
+import java.util.Date;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.util.Date;
 
 /**
  * Base abstract class for auditable aggregate roots.
@@ -18,7 +23,8 @@ import java.util.Date;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregateRoot<T>> extends AbstractAggregateRoot<T> {
+public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregateRoot<T>>
+        extends AbstractAggregateRoot<T> {
 
     /**
      * The primary key for the aggregate.
@@ -53,5 +59,7 @@ public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregate
      * Overwrites the creation timestamp. Used for UPSERT telemetry updates to simulate latest sample time.
      * NOTE: Use cautiously; changes auditing semantics.
      */
-    protected void overwriteCreatedAt(Date newDate) { this.createdAt = newDate; }
+    protected void overwriteCreatedAt(Date newDate) {
+        this.createdAt = newDate;
+    }
 }

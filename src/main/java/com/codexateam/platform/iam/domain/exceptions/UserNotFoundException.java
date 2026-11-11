@@ -8,6 +8,7 @@ import com.codexateam.platform.shared.domain.exceptions.DomainException;
 public class UserNotFoundException extends DomainException {
     /**
      * Constructs a new UserNotFoundException with the user ID.
+     *
      * @param userId The ID of the user that was not found
      */
     public UserNotFoundException(Long userId) {
@@ -16,6 +17,7 @@ public class UserNotFoundException extends DomainException {
 
     /**
      * Constructs a new UserNotFoundException with the user email.
+     *
      * @param email The email of the user that was not found
      */
     public UserNotFoundException(String email) {

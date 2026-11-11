@@ -5,18 +5,17 @@ import com.codexateam.platform.iam.domain.exceptions.InvalidPasswordException;
 import com.codexateam.platform.iam.domain.exceptions.UserAlreadyExistsException;
 import com.codexateam.platform.iam.domain.exceptions.UserNotFoundException;
 import com.codexateam.platform.iam.domain.model.aggregates.User;
+import com.codexateam.platform.iam.domain.model.commands.DeleteUserCommand;
 import com.codexateam.platform.iam.domain.model.commands.SignInCommand;
 import com.codexateam.platform.iam.domain.model.commands.SignUpCommand;
 import com.codexateam.platform.iam.domain.model.commands.UpdatePasswordCommand;
 import com.codexateam.platform.iam.domain.model.commands.UpdateUserCommand;
-import com.codexateam.platform.iam.domain.model.commands.DeleteUserCommand;
 import com.codexateam.platform.iam.domain.model.valueobjects.EmailAddress;
 import com.codexateam.platform.iam.domain.services.UserCommandService;
 import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * Implementation of UserCommandService.
@@ -43,7 +42,11 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (userRepository.existsByEmail(emailAddress)) {
             throw new UserAlreadyExistsException(command.email());
         }
-        var user = new User(command.name(), command.email(), hashingService.encode(command.password()), command.roles());
+        var user = new User(
+                command.name(),
+                command.email(),
+                hashingService.encode(command.password()),
+                command.roles());
         userRepository.save(user);
         return Optional.of(user);
     }
@@ -67,6 +70,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     /**
      * Handles updating user profile (name, email).
+     *
      * @param command The command containing user ID and new profile data
      * @return An Optional containing the updated user
      */
@@ -78,14 +82,18 @@ public class UserCommandServiceImpl implements UserCommandService {
             throw new UserNotFoundException(command.userId());
         }
         var user = userOpt.get();
-        if (command.name() != null && !command.name().isBlank()) user.setName(command.name());
-        if (command.email() != null && !command.email().isBlank()) user.setEmail(command.email());
+        if (command.name() != null && !command.name().isBlank()) {
+            user.setName(command.name());
+        }
+        if (command.email() != null && !command.email().isBlank()) {
+            user.setEmail(command.email());
+        }
         userRepository.save(user);
         return Optional.of(user);
     }
 
     /**
-     * Handles updating user password (verify current, then hash new password)
+     * Handles updating user password after verifying the current password.
      */
     @Override
     @Transactional
@@ -98,7 +106,8 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (command.newPassword() == null || command.newPassword().isBlank()) {
             throw new InvalidPasswordException("New password cannot be empty");
         }
-        if (command.currentPassword() == null || !hashingService.matches(command.currentPassword(), user.getPassword())) {
+        if (command.currentPassword() == null
+                || !hashingService.matches(command.currentPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password is incorrect");
         }
         user.setPassword(hashingService.encode(command.newPassword()));
@@ -108,6 +117,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     /**
      * Handles deleting a user.
+     *
      * @param command The command containing the user ID to delete
      */
     @Override
