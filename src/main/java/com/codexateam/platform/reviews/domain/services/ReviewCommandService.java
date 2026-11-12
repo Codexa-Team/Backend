@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface ReviewCommandService {
     /**
      * Handles the CreateReviewCommand.
+     *
      * @param command The command to create a review.
      * @return An Optional containing the created Review aggregate.
      */

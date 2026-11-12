@@ -5,6 +5,8 @@ import com.codexateam.platform.shared.domain.exceptions.UnauthorizedAccessExcept
 import com.codexateam.platform.shared.domain.exceptions.ValidationException;
 import com.codexateam.platform.shared.interfaces.rest.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,9 +17,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Global exception handler for all REST controllers.
  * Centralizes exception handling and provides consistent error responses.
@@ -25,6 +24,8 @@ import java.util.List;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String BAD_REQUEST = "Bad Request";
 
 
     /**
@@ -63,7 +64,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -99,13 +100,15 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException ex,
             HttpServletRequest request) {
 
+        Class<?> requiredType = ex.getRequiredType();
+        String typeName = requiredType != null ? requiredType.getSimpleName() : "unknown";
         String message = String.format("Invalid value for parameter '%s': expected type %s",
                 ex.getName(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown");
+                typeName);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                BAD_REQUEST,
                 message,
                 request.getRequestURI()
         );

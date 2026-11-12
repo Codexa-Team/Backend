@@ -3,15 +3,18 @@ package com.codexateam.platform.iam.interfaces.rest.transform;
 import com.codexateam.platform.iam.domain.model.aggregates.User;
 import com.codexateam.platform.iam.domain.model.entities.Role;
 import com.codexateam.platform.iam.interfaces.rest.resources.UserResource;
-
 import java.util.stream.Collectors;
 
 /**
  * Assembler to convert User entity to UserResource DTO.
  */
 public class UserResourceFromEntityAssembler {
+
+    private UserResourceFromEntityAssembler() {}
+
     /**
      * Converts a User entity to a UserResource DTO.
+     *
      * @param user The User entity to convert
      * @return The UserResource DTO
      */

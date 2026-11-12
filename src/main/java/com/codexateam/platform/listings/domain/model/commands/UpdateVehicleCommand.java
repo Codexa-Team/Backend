@@ -24,8 +24,12 @@ public record UpdateVehicleCommand(
 ) {
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UpdateVehicleCommand that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UpdateVehicleCommand that)) {
+            return false;
+        }
         return Objects.equals(vehicleId, that.vehicleId)
                 && Objects.equals(brand, that.brand)
                 && Objects.equals(model, that.model)

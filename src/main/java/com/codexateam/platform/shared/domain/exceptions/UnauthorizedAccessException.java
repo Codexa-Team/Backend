@@ -8,6 +8,7 @@ public class UnauthorizedAccessException extends DomainException {
 
     /**
      * Constructs a new UnauthorizedAccessException with the specified detail message.
+     *
      * @param message The detail message explaining the authorization failure
      */
     public UnauthorizedAccessException(String message) {

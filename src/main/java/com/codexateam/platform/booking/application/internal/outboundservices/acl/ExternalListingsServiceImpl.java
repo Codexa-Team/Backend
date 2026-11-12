@@ -2,9 +2,8 @@ package com.codexateam.platform.booking.application.internal.outboundservices.ac
 
 import com.codexateam.platform.listings.interfaces.acl.ListingsContextFacade;
 import com.codexateam.platform.listings.interfaces.rest.resources.VehicleResource;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of ExternalListingsService that delegates to the Listings context facade.
@@ -21,6 +20,7 @@ public class ExternalListingsServiceImpl implements ExternalListingsService {
 
     /**
      * Fetches vehicle details by delegating to the Listings context facade.
+     *
      * @param vehicleId The unique identifier of the vehicle
      * @return An Optional containing the VehicleResource if found, empty on error or not found
      */
@@ -35,6 +35,7 @@ public class ExternalListingsServiceImpl implements ExternalListingsService {
 
     /**
      * Retrieves the daily rental price for a vehicle from the Listings context.
+     *
      * @param vehicleId The unique identifier of the vehicle
      * @return An Optional containing the price per day if found, empty otherwise
      */
@@ -45,6 +46,7 @@ public class ExternalListingsServiceImpl implements ExternalListingsService {
 
     /**
      * Updates the status of a vehicle in the Listings context.
+     *
      * @param vehicleId The unique identifier of the vehicle
      * @param status The new status to set
      */

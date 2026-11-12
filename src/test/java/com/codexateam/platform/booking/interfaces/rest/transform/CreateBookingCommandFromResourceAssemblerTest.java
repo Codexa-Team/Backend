@@ -10,7 +10,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateBookingCommandFromResourceAssemblerTest {
+class CreateBookingCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform CreateBookingResource into CreateBookingCommand (AAA)")

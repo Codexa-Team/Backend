@@ -1,11 +1,10 @@
 package com.codexateam.platform.iot.application.internal.outboundservices.acl;
 
-import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
 import com.codexateam.platform.booking.domain.model.aggregates.Booking;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
 import com.codexateam.platform.booking.domain.services.BookingQueryService;
-import org.springframework.stereotype.Service;
-
 import java.util.Date;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of ExternalBookingService ACL for IoT context.
@@ -31,9 +30,9 @@ public class ExternalBookingServiceImpl implements ExternalBookingService {
         Date now = new Date();
         return bookings.stream()
                 .anyMatch(booking ->
-                        booking.getVehicleId().equals(vehicleId) &&
-                        isBookingActiveOrConfirmed(booking) &&
-                        isWithinBookingPeriod(booking, now)
+                        booking.getVehicleId().equals(vehicleId)
+                        && isBookingActiveOrConfirmed(booking)
+                        && isWithinBookingPeriod(booking, now)
                 );
     }
 

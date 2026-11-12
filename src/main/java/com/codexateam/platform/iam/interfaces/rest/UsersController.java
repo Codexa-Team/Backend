@@ -1,25 +1,29 @@
 package com.codexateam.platform.iam.interfaces.rest;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.codexateam.platform.iam.domain.model.queries.GetAllUsersQuery;
-import com.codexateam.platform.iam.domain.services.UserQueryService;
-import com.codexateam.platform.iam.domain.services.UserCommandService;
-import com.codexateam.platform.iam.interfaces.rest.resources.UserResource;
-import com.codexateam.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
-import com.codexateam.platform.iam.interfaces.rest.resources.UpdateUserResource;
-import com.codexateam.platform.iam.interfaces.rest.resources.UpdatePasswordResource;
-import com.codexateam.platform.iam.interfaces.rest.transform.UpdateUserCommandFromResourceAssembler;
-import com.codexateam.platform.iam.interfaces.rest.transform.UpdatePasswordCommandFromResourceAssembler;
-import com.codexateam.platform.iam.domain.model.commands.DeleteUserCommand;
 import com.codexateam.platform.iam.domain.exceptions.UserNotFoundException;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.codexateam.platform.iam.domain.model.commands.DeleteUserCommand;
+import com.codexateam.platform.iam.domain.model.queries.GetAllUsersQuery;
+import com.codexateam.platform.iam.domain.services.UserCommandService;
+import com.codexateam.platform.iam.domain.services.UserQueryService;
+import com.codexateam.platform.iam.interfaces.rest.resources.UpdatePasswordResource;
+import com.codexateam.platform.iam.interfaces.rest.resources.UpdateUserResource;
+import com.codexateam.platform.iam.interfaces.rest.resources.UserResource;
+import com.codexateam.platform.iam.interfaces.rest.transform.UpdatePasswordCommandFromResourceAssembler;
+import com.codexateam.platform.iam.interfaces.rest.transform.UpdateUserCommandFromResourceAssembler;
+import com.codexateam.platform.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST Controller for managing user profiles.
@@ -42,6 +46,7 @@ public class UsersController {
 
     /**
      * Retrieves all users.
+     *
      * @return list of user resources
      */
     @Operation(summary = "Get All Users", description = "Get a list of all users")
@@ -59,6 +64,7 @@ public class UsersController {
 
     /**
      * Updates a user's password.
+     *
      * @param userId user identifier
      * @param resource payload with current and new password
      * @return updated user resource
@@ -70,7 +76,9 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PatchMapping("/{userId}/password")
-    public ResponseEntity<UserResource> updatePassword(@PathVariable Long userId, @RequestBody UpdatePasswordResource resource) {
+    public ResponseEntity<UserResource> updatePassword(
+            @PathVariable Long userId,
+            @RequestBody UpdatePasswordResource resource) {
         var command = UpdatePasswordCommandFromResourceAssembler.toCommandFromResource(userId, resource);
         var updated = userCommandService.handle(command)
                 .map(UserResourceFromEntityAssembler::toResourceFromEntity)
@@ -80,6 +88,7 @@ public class UsersController {
 
     /**
      * Updates a user's profile (name, email).
+     *
      * @param userId user identifier
      * @param resource payload with updated fields
      * @return updated user resource
@@ -91,7 +100,9 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserResource> updateUser(@PathVariable Long userId, @RequestBody UpdateUserResource resource) {
+    public ResponseEntity<UserResource> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UpdateUserResource resource) {
         var command = UpdateUserCommandFromResourceAssembler.toCommandFromResource(userId, resource);
         var updated = userCommandService.handle(command)
                 .map(UserResourceFromEntityAssembler::toResourceFromEntity)
@@ -101,8 +112,9 @@ public class UsersController {
 
     /**
      * Deletes a user by ID.
+     *
      * @param userId user identifier
-     * @return empty 200 response
+     * @return empty 204 response
      */
     @Operation(summary = "Delete User", description = "Delete a user by ID")
     @ApiResponses(value = {
@@ -110,7 +122,7 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userCommandService.handle(new DeleteUserCommand(userId));
         return ResponseEntity.noContent().build();
     }

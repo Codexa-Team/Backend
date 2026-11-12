@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EmailAddressTest {
+class EmailAddressTest {
 
     @Test
     @DisplayName("EmailAddress with valid email creates instance successfully (AAA)")

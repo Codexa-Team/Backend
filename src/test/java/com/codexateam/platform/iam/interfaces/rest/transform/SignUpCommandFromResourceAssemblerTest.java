@@ -10,7 +10,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SignUpCommandFromResourceAssemblerTest {
+class SignUpCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform SignUpResource into SignUpCommand (AAA)")

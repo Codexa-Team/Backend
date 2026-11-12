@@ -1,38 +1,46 @@
 package com.codexateam.platform.booking.interfaces.rest;
 
 import com.codexateam.platform.booking.application.internal.outboundservices.acl.ExternalListingsService;
-import com.codexateam.platform.booking.domain.model.commands.CancelBookingCommand;
-import com.codexateam.platform.booking.domain.model.commands.ConfirmBookingCommand;
-import com.codexateam.platform.booking.domain.model.commands.RejectBookingCommand;
-import com.codexateam.platform.booking.domain.model.commands.UpdateBookingCommand;
-import com.codexateam.platform.booking.domain.model.queries.GetBookingsByOwnerIdQuery;
-import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
-import com.codexateam.platform.booking.domain.model.queries.GetBookingByIdQuery;
-import com.codexateam.platform.booking.domain.services.BookingCommandService;
-import com.codexateam.platform.booking.domain.services.BookingQueryService;
 import com.codexateam.platform.booking.domain.exceptions.BookingNotFoundException;
 import com.codexateam.platform.booking.domain.exceptions.InvalidBookingDatesException;
 import com.codexateam.platform.booking.domain.exceptions.InvalidBookingStatusException;
-import com.codexateam.platform.booking.domain.exceptions.UnauthorizedBookingAccessException;
 import com.codexateam.platform.booking.domain.exceptions.OwnerMismatchException;
+import com.codexateam.platform.booking.domain.exceptions.UnauthorizedBookingAccessException;
 import com.codexateam.platform.booking.domain.exceptions.VehicleNotAvailableException;
+import com.codexateam.platform.booking.domain.model.commands.CancelBookingCommand;
+import com.codexateam.platform.booking.domain.model.commands.ConfirmBookingCommand;
+import com.codexateam.platform.booking.domain.model.commands.DeleteBookingCommand;
+import com.codexateam.platform.booking.domain.model.commands.RejectBookingCommand;
+import com.codexateam.platform.booking.domain.model.commands.UpdateBookingCommand;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingByIdQuery;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingsByOwnerIdQuery;
+import com.codexateam.platform.booking.domain.model.queries.GetBookingsByRenterIdQuery;
+import com.codexateam.platform.booking.domain.services.BookingCommandService;
+import com.codexateam.platform.booking.domain.services.BookingQueryService;
 import com.codexateam.platform.booking.interfaces.rest.resources.BookingResource;
 import com.codexateam.platform.booking.interfaces.rest.resources.CreateBookingResource;
 import com.codexateam.platform.booking.interfaces.rest.transform.BookingResourceFromEntityAssembler;
 import com.codexateam.platform.booking.interfaces.rest.transform.CreateBookingCommandFromResourceAssembler;
 import com.codexateam.platform.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
-import com.codexateam.platform.booking.domain.model.commands.DeleteBookingCommand;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST Controller for the Booking bounded context.
@@ -43,7 +51,6 @@ import java.util.List;
 @Tag(name = "Bookings", description = "Endpoints for managing bookings")
 public class BookingsController {
 
-    // Constants to avoid hardcoding business literals
     private static final String ERROR_VEHICLE_NOT_FOUND = "Vehicle not found";
     private static final String ERROR_CREATE_BOOKING = "Error creating booking";
     private static final String ERROR_CONFIRM_BOOKING = "Error confirming booking";
@@ -56,7 +63,17 @@ public class BookingsController {
     private final BookingQueryService bookingQueryService;
     private final ExternalListingsService externalListingsService;
 
-    public BookingsController(BookingCommandService bookingCommandService, BookingQueryService bookingQueryService, ExternalListingsService externalListingsService) {
+    /**
+     * Creates a new bookings controller.
+     *
+     * @param bookingCommandService booking command handler
+     * @param bookingQueryService booking query handler
+     * @param externalListingsService ACL gateway to vehicle listings
+     */
+    public BookingsController(
+            BookingCommandService bookingCommandService,
+            BookingQueryService bookingQueryService,
+            ExternalListingsService externalListingsService) {
         this.bookingCommandService = bookingCommandService;
         this.bookingQueryService = bookingQueryService;
         this.externalListingsService = externalListingsService;
@@ -64,11 +81,14 @@ public class BookingsController {
 
     /**
      * Extracts authenticated user ID.
+     *
      * @return user id
      */
     private Long getAuthenticatedUserId() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
             throw new SecurityException("User not authenticated");
         }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -77,10 +97,13 @@ public class BookingsController {
 
     /**
      * Creates a new booking (renter only).
+     *
      * @param resource booking payload
      * @return created booking resource
      */
-    @Operation(summary = "Create Booking", description = "Create a new booking request for a vehicle (ROLE_ARRENDATARIO)")
+    @Operation(
+            summary = "Create Booking",
+            description = "Create a new booking request for a vehicle (ROLE_ARRENDATARIO)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Booking created"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
@@ -102,9 +125,12 @@ public class BookingsController {
 
     /**
      * Lists bookings for authenticated renter.
+     *
      * @return list of renter bookings
      */
-    @Operation(summary = "Get Renter Bookings", description = "Get all bookings made by the authenticated renter (ROLE_ARRENDATARIO)")
+    @Operation(
+            summary = "Get Renter Bookings",
+            description = "Get all bookings made by the authenticated renter (ROLE_ARRENDATARIO)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bookings found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -123,9 +149,12 @@ public class BookingsController {
 
     /**
      * Lists booking requests for authenticated owner.
+     *
      * @return list of owner booking requests
      */
-    @Operation(summary = "Get Owner Booking Requests", description = "Get all booking requests for the authenticated owner (ROLE_ARRENDADOR)")
+    @Operation(
+            summary = "Get Owner Booking Requests",
+            description = "Get all booking requests for the authenticated owner (ROLE_ARRENDADOR)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Requests found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -144,6 +173,7 @@ public class BookingsController {
 
     /**
      * Confirms a booking (owner only).
+     *
      * @param bookingId booking identifier
      * @return confirmed booking resource
      */
@@ -173,6 +203,7 @@ public class BookingsController {
 
     /**
      * Rejects a booking (owner only).
+     *
      * @param bookingId booking identifier
      * @return rejected booking resource
      */
@@ -202,6 +233,7 @@ public class BookingsController {
 
     /**
      * Cancels a booking (renter only).
+     *
      * @param bookingId booking identifier
      * @return canceled booking resource
      */
@@ -224,6 +256,7 @@ public class BookingsController {
 
     /**
      * Retrieves a booking by ID (owner or renter).
+     *
      * @param bookingId booking identifier
      * @return booking resource
      */
@@ -244,8 +277,9 @@ public class BookingsController {
 
     /**
      * Deletes a booking by ID.
+     *
      * @param bookingId booking identifier
-     * @return empty 200 response
+     * @return empty 204 response
      */
     @Operation(summary = "Delete Booking", description = "Delete a booking by its ID")
     @ApiResponses(value = {
@@ -253,13 +287,14 @@ public class BookingsController {
             @ApiResponse(responseCode = "404", description = "Booking not found")
     })
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<?> deleteBooking(@PathVariable Long bookingId) {
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId) {
         bookingCommandService.handle(new DeleteBookingCommand(bookingId));
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Updates (renews) booking end date and recalculates price.
+     * Updates (renews) booking end date and recalculates price (minimum 1 day).
+     *
      * @param bookingId booking identifier
      * @param resource payload with new end date
      * @return updated booking resource
@@ -271,21 +306,26 @@ public class BookingsController {
     })
     @PutMapping("/{bookingId}")
     @PreAuthorize("hasRole('ROLE_ARRENDATARIO') or hasRole('ROLE_ARRENDADOR')")
-    public ResponseEntity<BookingResource> updateBooking(@PathVariable Long bookingId, @RequestBody CreateBookingResource resource) {
+    public ResponseEntity<BookingResource> updateBooking(
+            @PathVariable Long bookingId,
+            @RequestBody CreateBookingResource resource) {
         var existingBooking = bookingQueryService.handle(new GetBookingByIdQuery(bookingId))
                 .orElseThrow(() -> new BookingNotFoundException(bookingId));
 
         if (resource.endDate().before(existingBooking.getStartDate())) {
             throw new InvalidBookingDatesException(existingBooking.getStartDate(), resource.endDate(),
-                                                   "New end date must be after the original start date");
+                    "New end date must be after the original start date");
         }
 
         long diffInMillis = Math.abs(resource.endDate().getTime() - existingBooking.getStartDate().getTime());
-        long days = java.util.concurrent.TimeUnit.DAYS.convert(diffInMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
-        if (days == 0) days = 1; // Javadoc ya explica la regla
+        long days = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        if (days == 0) {
+            days = 1;
+        }
 
         var vehicle = externalListingsService.fetchVehicleById(existingBooking.getVehicleId())
-                .orElseThrow(() -> new VehicleNotAvailableException(existingBooking.getVehicleId(), ERROR_VEHICLE_NOT_FOUND));
+                .orElseThrow(() -> new VehicleNotAvailableException(
+                        existingBooking.getVehicleId(), ERROR_VEHICLE_NOT_FOUND));
 
         Double totalPrice = vehicle.pricePerDay() * days;
         var command = new UpdateBookingCommand(bookingId, resource.endDate(), totalPrice);

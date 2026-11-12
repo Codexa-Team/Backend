@@ -23,8 +23,12 @@ public record CreateVehicleCommand(
 ) {
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CreateVehicleCommand that)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CreateVehicleCommand that)) {
+            return false;
+        }
         return Objects.equals(brand, that.brand)
                 && Objects.equals(model, that.model)
                 && Objects.equals(year, that.year)

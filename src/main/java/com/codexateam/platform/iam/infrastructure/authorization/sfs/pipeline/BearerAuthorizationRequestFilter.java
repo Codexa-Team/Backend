@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 /**
  * Custom Spring Security filter to process JWT tokens from the Authorization header.
@@ -31,17 +30,20 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getRequestURI();
 
-        if (path.startsWith("/api/v1/authentication/") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-ui") ||
-                path.startsWith("/swagger-resources") ||
-                path.startsWith("/webjars") ||
-                path.equals("/error") ||
-                path.equals("/")) {
+        if (path.startsWith("/api/v1/authentication/")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/webjars")
+                || path.equals("/error")
+                || path.equals("/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,11 +53,13 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
             if (jwt != null && tokenService.validateToken(jwt)) {
                 String email = tokenService.getEmailFromToken(jwt);
                 var userDetails = userDetailsService.loadUserByUsername(email);
-                var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
+            SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);
     }

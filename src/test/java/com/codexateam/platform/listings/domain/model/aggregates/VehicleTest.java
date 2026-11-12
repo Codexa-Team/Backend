@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VehicleTest {
+class VehicleTest {
 
     @Test
     @DisplayName("Vehicle constructor from CreateVehicleCommand sets fields and default status available (AAA)")

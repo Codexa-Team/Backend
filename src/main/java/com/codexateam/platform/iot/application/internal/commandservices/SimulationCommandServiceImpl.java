@@ -40,7 +40,8 @@ public class SimulationCommandServiceImpl implements SimulationCommandService {
     }
 
     @Override
-    public void startCustomSimulation(Long vehicleId, Long userId, double startLat, double startLng, double endLat, double endLng) {
+    public void startCustomSimulation(
+            Long vehicleId, Long userId, double startLat, double startLng, double endLat, double endLng) {
         validateSimulationAuthorization(vehicleId, userId);
     }
 }

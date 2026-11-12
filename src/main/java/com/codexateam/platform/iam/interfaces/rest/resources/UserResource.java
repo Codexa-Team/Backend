@@ -4,6 +4,7 @@ import java.util.Set;
 
 /**
  * DTO for returning user data.
+ *
  * @param id The user's ID.
  * @param name The user's full name.
  * @param email The user's email.

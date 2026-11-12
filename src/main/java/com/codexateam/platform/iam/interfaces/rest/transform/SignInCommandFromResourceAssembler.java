@@ -7,8 +7,12 @@ import com.codexateam.platform.iam.interfaces.rest.resources.SignInResource;
  * Assembler to convert SignInResource DTO to SignInCommand.
  */
 public class SignInCommandFromResourceAssembler {
+
+    private SignInCommandFromResourceAssembler() {}
+
     /**
      * Converts a SignInResource DTO to a SignInCommand.
+     *
      * @param resource The sign-in resource DTO
      * @return The SignInCommand
      */

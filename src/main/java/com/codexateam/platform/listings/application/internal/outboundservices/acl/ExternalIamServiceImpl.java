@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * Implementation of ExternalIamService ACL for Listings context.
  * Communicates with the IAM bounded context to validate user permissions.
  *
- * Note: This wraps UserQueryService directly. When IamContextFacade is available,
+ * <p>Note: This wraps UserQueryService directly. When IamContextFacade is available,
  * refactor to use it instead for better encapsulation.
  */
 @Service

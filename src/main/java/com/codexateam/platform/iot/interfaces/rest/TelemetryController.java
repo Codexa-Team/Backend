@@ -1,34 +1,40 @@
 package com.codexateam.platform.iot.interfaces.rest;
 
+import com.codexateam.platform.booking.infrastructure.persistence.jpa.repositories.BookingRepository;
+import com.codexateam.platform.iam.domain.model.aggregates.User;
 import com.codexateam.platform.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
+import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import com.codexateam.platform.iot.application.internal.outboundservices.AutomaticTelemetryGeneratorService;
-import com.codexateam.platform.iot.domain.model.queries.GetTelemetryByVehicleIdQuery;
 import com.codexateam.platform.iot.domain.model.queries.GetLatestTelemetryQuery;
+import com.codexateam.platform.iot.domain.model.queries.GetTelemetryByVehicleIdQuery;
+import com.codexateam.platform.iot.domain.services.SimulationCommandService;
 import com.codexateam.platform.iot.domain.services.TelemetryCommandService;
 import com.codexateam.platform.iot.domain.services.TelemetryQueryService;
 import com.codexateam.platform.iot.interfaces.rest.resources.RecordTelemetryResource;
 import com.codexateam.platform.iot.interfaces.rest.resources.TelemetryResource;
 import com.codexateam.platform.iot.interfaces.rest.transform.RecordTelemetryCommandFromResourceAssembler;
 import com.codexateam.platform.iot.interfaces.rest.transform.TelemetryResourceFromEntityAssembler;
-import com.codexateam.platform.booking.infrastructure.persistence.jpa.repositories.BookingRepository;
-import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
-import com.codexateam.platform.iam.domain.model.aggregates.User;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST Controller for the IoT bounded context.
@@ -48,17 +54,18 @@ public class TelemetryController {
 
     private final TelemetryCommandService telemetryCommandService;
     private final TelemetryQueryService telemetryQueryService;
-    private final com.codexateam.platform.iot.domain.services.SimulationCommandService simulationCommandService;
+    private final SimulationCommandService simulationCommandService;
     private final AutomaticTelemetryGeneratorService automaticTelemetryGeneratorService;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
 
     private final Map<Long, List<List<Double>>> routeCache = new ConcurrentHashMap<>();
 
+    /** Initializes telemetry REST dependencies and repositories for active renter enrichment. */
     public TelemetryController(
             TelemetryCommandService telemetryCommandService,
             TelemetryQueryService telemetryQueryService,
-            com.codexateam.platform.iot.domain.services.SimulationCommandService simulationCommandService,
+            SimulationCommandService simulationCommandService,
             AutomaticTelemetryGeneratorService automaticTelemetryGeneratorService,
             BookingRepository bookingRepository,
             UserRepository userRepository) {
@@ -69,9 +76,10 @@ public class TelemetryController {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
     }
-    
+
     /**
      * Extracts authenticated user ID from security context.
+     *
      * @return Authenticated user ID
      * @throws SecurityException if user is not authenticated
      */
@@ -128,7 +136,8 @@ public class TelemetryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Telemetry data retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - not authorized to view this vehicle's telemetry")
+            @ApiResponse(responseCode = "403",
+                    description = "Forbidden - not authorized to view this vehicle's telemetry")
     })
     public ResponseEntity<List<TelemetryResource>> getTelemetryByVehicleId(@PathVariable Long vehicleId) {
         Long userId = getAuthenticatedUserId();
@@ -156,7 +165,8 @@ public class TelemetryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Latest telemetry found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - not authorized to view this vehicle's telemetry"),
+            @ApiResponse(responseCode = "403",
+                    description = "Forbidden - not authorized to view this vehicle's telemetry"),
             @ApiResponse(responseCode = "404", description = "No telemetry data found for this vehicle")
     })
     public ResponseEntity<TelemetryResource> getLatestTelemetryByVehicleId(@PathVariable Long vehicleId) {
@@ -180,10 +190,11 @@ public class TelemetryController {
                 .toResourceFromEntity(optionalTelemetry.get(), plannedRoute);
 
         Date now = new Date();
-        bookingRepository.findFirstByVehicleIdAndBookingStatus_StatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-                vehicleId, BOOKING_STATUS_CONFIRMED, now, now)
-            .flatMap(booking -> userRepository.findById(booking.getRenterId()).map(User::getName))
-            .ifPresent(resource::setRenterName);
+        bookingRepository
+                .findFirstActiveBookingByVehicleAndStatus(
+                        vehicleId, BOOKING_STATUS_CONFIRMED, now, now)
+                .flatMap(booking -> userRepository.findById(booking.getRenterId()).map(User::getName))
+                .ifPresent(resource::setRenterName);
 
         if (resource.getRenterName() == null) {
             resource.setRenterName(DEFAULT_RENTER_NAME);
@@ -202,8 +213,10 @@ public class TelemetryController {
      */
     @PostMapping("/simulate/{vehicleId}")
     @PreAuthorize("hasRole('ROLE_ARRENDADOR')")
-    @Operation(summary = "Start Telemetry Simulation",
-               description = "Start a realistic telemetry simulation for a vehicle using real road coordinates (Owner only)")
+    @Operation(
+            summary = "Start Telemetry Simulation",
+            description = "Start a realistic telemetry simulation for a vehicle using real road "
+                    + "coordinates (Owner only)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Simulation started successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -219,7 +232,8 @@ public class TelemetryController {
                 "message", "Telemetry simulation started for vehicle " + vehicleId,
                 "status", "running",
                 "vehicle_id", vehicleId.toString(),
-                "note", "Simulation is running asynchronously. Use GET /api/v1/telemetry/vehicle/" + vehicleId + " to view results."
+                "note", "Simulation is running asynchronously. Use GET /api/v1/telemetry/vehicle/"
+                        + vehicleId + " to view results."
             )
         );
     }
@@ -262,7 +276,8 @@ public class TelemetryController {
                 "status", "running",
                 "vehicle_id", vehicleId.toString(),
                 "route", String.format("(%.6f, %.6f) -> (%.6f, %.6f)", startLat, startLng, endLat, endLng),
-                "note", "Simulation is running asynchronously. Use GET /api/v1/telemetry/vehicle/" + vehicleId + " to view results."
+                "note", "Simulation is running asynchronously. Use GET /api/v1/telemetry/vehicle/"
+                        + vehicleId + " to view results."
             )
         );
     }

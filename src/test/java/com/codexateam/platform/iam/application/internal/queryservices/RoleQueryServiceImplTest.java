@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RoleQueryServiceImplTest {
+class RoleQueryServiceImplTest {
 
     @Mock
     private RoleRepository roleRepository;

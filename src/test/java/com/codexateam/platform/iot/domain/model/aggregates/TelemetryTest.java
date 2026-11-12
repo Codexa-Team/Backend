@@ -8,7 +8,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TelemetryTest {
+class TelemetryTest {
 
     @Test
     @DisplayName("Telemetry constructor initializes all fields from RecordTelemetryCommand (AAA)")

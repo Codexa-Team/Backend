@@ -8,6 +8,7 @@ public class ValidationException extends DomainException {
 
     /**
      * Constructs a new ValidationException with the specified detail message.
+     *
      * @param message The detail message explaining the validation failure
      */
     public ValidationException(String message) {

@@ -1,17 +1,16 @@
 package com.codexateam.platform.listings.interfaces.acl;
 
 import com.codexateam.platform.listings.domain.model.aggregates.Vehicle;
-import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery;
-import com.codexateam.platform.listings.domain.services.VehicleQueryService;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
 import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleStatusCommand;
+import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery;
 import com.codexateam.platform.listings.domain.services.VehicleCommandService;
+import com.codexateam.platform.listings.domain.services.VehicleQueryService;
 import com.codexateam.platform.listings.interfaces.rest.resources.VehicleResource;
 import com.codexateam.platform.listings.interfaces.rest.transform.VehicleResourceFromEntityAssembler;
+import java.util.Optional;
+import org.springframework.stereotype.Service;
 
+/** Anti-Corruption Layer facade exposing vehicle queries and status updates across contexts. */
 @Service
 public class ListingsContextFacade {
 
@@ -19,6 +18,7 @@ public class ListingsContextFacade {
     private final VehicleCommandService vehicleCommandService;
     private final VehicleResourceFromEntityAssembler vehicleResourceFromEntityAssembler;
 
+    /** Initializes facade services and assembler for cross-context listing operations. */
     public ListingsContextFacade(VehicleQueryService vehicleQueryService,
                                 VehicleCommandService vehicleCommandService,
                                 VehicleResourceFromEntityAssembler vehicleResourceFromEntityAssembler) {
@@ -68,6 +68,7 @@ public class ListingsContextFacade {
 
     /**
      * Retrieves a VehicleResource by ID for cross-context use (ACL for Booking, IoT, etc.).
+     *
      * @param vehicleId The ID of the vehicle.
      * @return Optional with VehicleResource if found, otherwise empty.
      */

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class VehicleQueryServiceImplTest {
+class VehicleQueryServiceImplTest {
 
     @Mock
     private VehicleRepository vehicleRepository;

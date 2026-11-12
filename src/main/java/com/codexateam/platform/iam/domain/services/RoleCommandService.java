@@ -8,6 +8,7 @@ import com.codexateam.platform.iam.domain.model.commands.SeedRolesCommand;
 public interface RoleCommandService {
     /**
      * Handles the SeedRolesCommand to initialize system roles.
+     *
      * @param command The seed roles command
      */
     void handle(SeedRolesCommand command);

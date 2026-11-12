@@ -5,6 +5,7 @@ import java.util.Set;
 
 /**
  * Command to initiate a user sign-up process.
+ *
  * @param name The user's full name.
  * @param email The user's email.
  * @param password The user's raw password.

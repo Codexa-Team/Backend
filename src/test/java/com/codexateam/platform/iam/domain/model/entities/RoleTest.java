@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RoleTest {
+class RoleTest {
 
     @Test
     @DisplayName("Role constructor with Roles.ROLE_ARRENDADOR sets name enum (AAA)")

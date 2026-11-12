@@ -1,11 +1,10 @@
 package com.codexateam.platform.iot.interfaces.rest.resources;
 
+import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * Represents a telemetry data resource.

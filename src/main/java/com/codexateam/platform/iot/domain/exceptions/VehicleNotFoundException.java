@@ -1,13 +1,16 @@
 package com.codexateam.platform.iot.domain.exceptions;
+
 import com.codexateam.platform.shared.domain.exceptions.ResourceNotFoundException;
 
 /**
  * Exception thrown when a vehicle is not found in the Listings context.
  * Used by IoT context when validating telemetry data.
  */
+@SuppressWarnings("java:S110")
 public class VehicleNotFoundException extends ResourceNotFoundException {
     /**
      * Constructs a new VehicleNotFoundException with the vehicle ID.
+     *
      * @param vehicleId The ID of the vehicle that was not found
      */
     public VehicleNotFoundException(Long vehicleId) {

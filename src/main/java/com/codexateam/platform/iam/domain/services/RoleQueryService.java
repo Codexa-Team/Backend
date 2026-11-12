@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface RoleQueryService {
     /**
      * Retrieves a role by its name.
+     *
      * @param query The query containing the role name
      * @return An Optional containing the role if found, empty otherwise
      */
@@ -19,6 +20,7 @@ public interface RoleQueryService {
 
     /**
      * Retrieves all available roles in the system.
+     *
      * @param query The query to get all roles
      * @return A list of all roles
      */

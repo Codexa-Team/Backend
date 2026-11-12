@@ -1,15 +1,13 @@
 package com.codexateam.platform.iam.application.internal.queryservices;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.codexateam.platform.iam.domain.model.aggregates.User;
 import com.codexateam.platform.iam.domain.model.queries.GetAllUsersQuery;
 import com.codexateam.platform.iam.domain.model.queries.GetUserByIdQuery;
 import com.codexateam.platform.iam.domain.services.UserQueryService;
 import com.codexateam.platform.iam.infrastructure.persistence.jpa.repositories.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of UserQueryService.
@@ -26,6 +24,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     /**
      * Retrieves all users from the repository.
+     *
      * @param query The query to retrieve all users
      * @return List of all users
      */
@@ -36,6 +35,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     /**
      * Retrieves a user by their unique identifier.
+     *
      * @param query The query containing the user ID
      * @return An Optional containing the user if found, empty otherwise
      */

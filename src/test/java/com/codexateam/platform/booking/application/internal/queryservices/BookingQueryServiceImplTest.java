@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookingQueryServiceImplTest {
+class BookingQueryServiceImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
@@ -51,10 +51,11 @@ public class BookingQueryServiceImplTest {
     @DisplayName("handle(GetBookingByIdQuery) should throw BookingNotFoundException when not found (AAA)")
     void handle_GetBookingByIdQuery_ShouldThrowException_WhenNotFound() {
         // Arrange
+        var query = new GetBookingByIdQuery(999L);
         when(bookingRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(BookingNotFoundException.class, () -> bookingQueryService.handle(new GetBookingByIdQuery(999L)));
+        assertThrows(BookingNotFoundException.class, () -> bookingQueryService.handle(query));
         verify(bookingRepository, times(1)).findById(999L);
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TelemetryResourceFromEntityAssemblerTest {
+class TelemetryResourceFromEntityAssemblerTest {
 
     @Test
     @DisplayName("toResourceFromEntity maps Telemetry aggregate to TelemetryResource (AAA)")

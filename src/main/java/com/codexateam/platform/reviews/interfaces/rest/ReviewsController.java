@@ -1,29 +1,34 @@
 package com.codexateam.platform.reviews.interfaces.rest;
 
 import com.codexateam.platform.iam.infrastructure.authorization.sfs.model.UserDetailsImpl;
+import com.codexateam.platform.reviews.domain.exceptions.CompletedBookingRequiredException;
+import com.codexateam.platform.reviews.domain.exceptions.ReviewAlreadyExistsException;
+import com.codexateam.platform.reviews.domain.exceptions.ReviewNotFoundException;
+import com.codexateam.platform.reviews.domain.model.queries.GetReviewByIdQuery;
 import com.codexateam.platform.reviews.domain.model.queries.GetReviewsByRenterIdQuery;
 import com.codexateam.platform.reviews.domain.model.queries.GetReviewsByVehicleIdQuery;
-import com.codexateam.platform.reviews.domain.model.queries.GetReviewByIdQuery;
-import com.codexateam.platform.reviews.domain.exceptions.ReviewNotFoundException;
-import com.codexateam.platform.reviews.domain.exceptions.ReviewAlreadyExistsException;
-import com.codexateam.platform.reviews.domain.exceptions.CompletedBookingRequiredException;
 import com.codexateam.platform.reviews.domain.services.ReviewCommandService;
 import com.codexateam.platform.reviews.domain.services.ReviewQueryService;
 import com.codexateam.platform.reviews.interfaces.rest.resources.CreateReviewResource;
 import com.codexateam.platform.reviews.interfaces.rest.resources.ReviewResource;
 import com.codexateam.platform.reviews.interfaces.rest.transform.CreateReviewCommandFromResourceAssembler;
 import com.codexateam.platform.reviews.interfaces.rest.transform.ReviewResourceFromEntityAssembler;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST Controller for managing reviews.
@@ -47,11 +52,13 @@ public class ReviewsController {
 
     /**
      * Extracts authenticated user ID.
+     *
      * @return user id
      */
     private Long getAuthenticatedUserId() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || ANONYMOUS_USER.equals(authentication.getPrincipal())) {
             throw new SecurityException(ERROR_USER_NOT_AUTHENTICATED);
         }
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -60,6 +67,7 @@ public class ReviewsController {
 
     /**
      * Creates a new review (renter only).
+     *
      * @param resource review payload
      * @return created review resource
      */
@@ -82,6 +90,7 @@ public class ReviewsController {
 
     /**
      * Retrieves reviews for a vehicle (public).
+     *
      * @param vehicleId vehicle identifier
      * @return list of reviews
      */
@@ -101,11 +110,14 @@ public class ReviewsController {
 
     /**
      * Retrieves reviews written by authenticated renter.
+     *
      * @return list of renter reviews
      */
     @GetMapping("/my-reviews")
     @PreAuthorize("hasRole('ROLE_ARRENDATARIO')")
-    @Operation(summary = "Get Renter Reviews", description = "Get all reviews written by the authenticated renter (ROLE_ARRENDATARIO)")
+    @Operation(
+            summary = "Get Renter Reviews",
+            description = "Get all reviews written by the authenticated renter (ROLE_ARRENDATARIO)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reviews found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -122,6 +134,7 @@ public class ReviewsController {
 
     /**
      * Retrieves a single review by its ID.
+     *
      * @param reviewId review identifier
      * @return review resource if found
      */

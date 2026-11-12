@@ -1,15 +1,14 @@
 package com.codexateam.platform.iot.application.internal.queryservices;
 
 import com.codexateam.platform.iot.domain.exceptions.RouteNotFoundException;
-import com.codexateam.platform.iot.domain.model.queries.GetRouteQuery;
 import com.codexateam.platform.iot.domain.model.queries.GetCompleteRouteQuery;
+import com.codexateam.platform.iot.domain.model.queries.GetRouteQuery;
 import com.codexateam.platform.iot.domain.services.RouteQueryService;
 import com.codexateam.platform.iot.infrastructure.external.OpenRouteServiceApiClient;
 import com.codexateam.platform.iot.infrastructure.external.dto.RouteResponse;
 import com.codexateam.platform.shared.domain.exceptions.ValidationException;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of RouteQueryService.
@@ -27,6 +26,7 @@ public class RouteQueryServiceImpl implements RouteQueryService {
 
     /**
      * Validates geographic coordinates.
+     *
      * @param startLat Starting latitude
      * @param startLng Starting longitude
      * @param endLat Ending latitude

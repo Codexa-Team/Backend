@@ -1,22 +1,21 @@
 package com.codexateam.platform.listings.application.internal.commandservices;
 
+import com.codexateam.platform.booking.infrastructure.persistence.jpa.repositories.BookingRepository;
+import com.codexateam.platform.iot.infrastructure.persistence.jpa.repositories.TelemetryRepository;
 import com.codexateam.platform.listings.application.internal.outboundservices.acl.ExternalIamService;
-import com.codexateam.platform.listings.domain.model.aggregates.Vehicle;
-import com.codexateam.platform.listings.domain.model.commands.CreateVehicleCommand;
-import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleStatusCommand;
-import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
-import com.codexateam.platform.listings.domain.model.commands.DeleteVehicleCommand;
-import com.codexateam.platform.listings.domain.services.VehicleCommandService;
 import com.codexateam.platform.listings.domain.exceptions.OwnerNotFoundException;
 import com.codexateam.platform.listings.domain.exceptions.VehicleNotFoundException;
+import com.codexateam.platform.listings.domain.model.aggregates.Vehicle;
+import com.codexateam.platform.listings.domain.model.commands.CreateVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.DeleteVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleCommand;
+import com.codexateam.platform.listings.domain.model.commands.UpdateVehicleStatusCommand;
+import com.codexateam.platform.listings.domain.services.VehicleCommandService;
 import com.codexateam.platform.listings.infrastructure.persistence.jpa.repositories.VehicleRepository;
-import com.codexateam.platform.booking.infrastructure.persistence.jpa.repositories.BookingRepository;
 import com.codexateam.platform.reviews.infrastructure.persistence.jpa.repositories.ReviewRepository;
-import com.codexateam.platform.iot.infrastructure.persistence.jpa.repositories.TelemetryRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * Implementation of VehicleCommandService.
@@ -33,6 +32,7 @@ public class VehicleCommandServiceImpl implements VehicleCommandService {
     private final ReviewRepository reviewRepository;
     private final TelemetryRepository telemetryRepository;
 
+    /** Initializes repositories and ACL service required for vehicle lifecycle commands. */
     public VehicleCommandServiceImpl(VehicleRepository vehicleRepository,
                                      ExternalIamService externalIamService,
                                      BookingRepository bookingRepository,
@@ -91,6 +91,7 @@ public class VehicleCommandServiceImpl implements VehicleCommandService {
     /**
      * Handles the UpdateVehicleCommand.
      * Updates the vehicle's information (brand, model, year, pricePerDay, imageUrl).
+     *
      * @param command The command containing the updated vehicle data.
      * @return An Optional containing the updated Vehicle
      * @throws VehicleNotFoundException if the vehicle is not found
@@ -109,6 +110,7 @@ public class VehicleCommandServiceImpl implements VehicleCommandService {
     /**
      * Handles the DeleteVehicleCommand.
      * Deletes a vehicle and all related data (bookings, reviews, telemetry) in a cascading manner.
+     *
      * @param command The command containing the vehicle ID to delete
      * @throws VehicleNotFoundException if the vehicle is not found
      */

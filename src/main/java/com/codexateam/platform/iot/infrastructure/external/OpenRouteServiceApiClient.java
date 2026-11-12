@@ -3,15 +3,15 @@ package com.codexateam.platform.iot.infrastructure.external;
 import com.codexateam.platform.iot.infrastructure.external.dto.RouteResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+/** HTTP client for querying driving route geometry from OpenRouteService. */
 @Service
 public class OpenRouteServiceApiClient {
 
@@ -78,9 +78,12 @@ public class OpenRouteServiceApiClient {
         }
     }
 
+    /** Returns a route wrapper with placeholder zero metrics, or null when no route exists. */
     public RouteResponse getCompleteRoute(double startLat, double startLng, double endLat, double endLng) {
         List<double[]> coords = getRouteCoordinates(startLat, startLng, endLat, endLng);
-        if (coords.isEmpty()) return null;
+        if (coords.isEmpty()) {
+            return null;
+        }
 
         return new RouteResponse(coords, 0.0, 0.0);
     }

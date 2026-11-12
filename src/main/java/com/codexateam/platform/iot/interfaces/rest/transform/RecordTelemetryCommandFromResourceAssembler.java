@@ -7,8 +7,12 @@ import com.codexateam.platform.iot.interfaces.rest.resources.RecordTelemetryReso
  * Assembler to convert RecordTelemetryResource DTO to RecordTelemetryCommand.
  */
 public class RecordTelemetryCommandFromResourceAssembler {
+
+    private RecordTelemetryCommandFromResourceAssembler() {}
+
     /**
      * Converts a RecordTelemetryResource DTO to a RecordTelemetryCommand.
+     *
      * @param resource The record telemetry resource DTO
      * @return The RecordTelemetryCommand
      */

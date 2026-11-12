@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SignInCommandFromResourceAssemblerTest {
+class SignInCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform SignInResource into SignInCommand (AAA)")

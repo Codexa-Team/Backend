@@ -14,6 +14,7 @@ public class RouteResponse {
     public RouteResponse() {
     }
 
+    /** Initializes a route response with geometry coordinates, distance, and duration. */
     public RouteResponse(List<double[]> coordinates, Double distanceMeters, Double durationSeconds) {
         this.coordinates = coordinates;
         this.distanceMeters = distanceMeters;
@@ -107,14 +108,14 @@ public class RouteResponse {
 
     @Override
     public String toString() {
-        return "RouteResponse{" +
-                "coordinatesCount=" + (coordinates != null ? coordinates.size() : 0) +
-                ", distanceMeters=" + distanceMeters +
-                ", durationSeconds=" + durationSeconds +
-                ", distanceKm=" + getDistanceKilometers() +
-                ", durationMin=" + getDurationMinutes() +
-                ", avgSpeedKmh=" + getAverageSpeedKmh() +
-                '}';
+        return "RouteResponse{"
+                + "coordinatesCount=" + (coordinates != null ? coordinates.size() : 0)
+                + ", distanceMeters=" + distanceMeters
+                + ", durationSeconds=" + durationSeconds
+                + ", distanceKm=" + getDistanceKilometers()
+                + ", durationMin=" + getDurationMinutes()
+                + ", avgSpeedKmh=" + getAverageSpeedKmh()
+                + '}';
     }
 }
 

@@ -28,6 +28,7 @@ public class OpenApiConfiguration {
 
     /**
      * Creates the main OpenAPI bean definition.
+     *
      * @return The configured OpenAPI object.
      */
     @Bean

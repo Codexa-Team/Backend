@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookingCommandServiceImplTest {
+class BookingCommandServiceImplTest {
 
     @Mock
     private BookingRepository bookingRepository;
@@ -56,9 +56,9 @@ public class BookingCommandServiceImplTest {
         var vehicleResource = new VehicleResource(10L, "Toyota", "Yaris", 2021, 40.0, "available", "yaris.jpg", 1L, new Date());
 
         when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(vehicleResource));
-        when(bookingRepository.existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
+        when(bookingRepository.existsOverlappingBookingByStatus(
                 eq(10L), eq(BookingStatus.PENDING), any(Date.class), any(Date.class))).thenReturn(false);
-        when(bookingRepository.existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
+        when(bookingRepository.existsOverlappingBookingByStatus(
                 eq(10L), eq(BookingStatus.CONFIRMED), any(Date.class), any(Date.class))).thenReturn(false);
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -119,7 +119,7 @@ public class BookingCommandServiceImplTest {
         var vehicleResource = new VehicleResource(10L, "Toyota", "Yaris", 2021, 40.0, "available", "yaris.jpg", 1L, new Date());
 
         when(externalListingsService.fetchVehicleById(10L)).thenReturn(Optional.of(vehicleResource));
-        when(bookingRepository.existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
+        when(bookingRepository.existsOverlappingBookingByStatus(
                 eq(10L), eq(BookingStatus.PENDING), any(Date.class), any(Date.class))).thenReturn(true);
 
         // Act & Assert
@@ -155,10 +155,11 @@ public class BookingCommandServiceImplTest {
     @DisplayName("handle(ConfirmBookingCommand) should throw BookingNotFoundException when booking missing (AAA)")
     void handle_ConfirmBookingCommand_ShouldThrowException_WhenNotFound() {
         // Arrange
+        var command = new ConfirmBookingCommand(999L);
         when(bookingRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(BookingNotFoundException.class, () -> bookingCommandService.handle(new ConfirmBookingCommand(999L)));
+        assertThrows(BookingNotFoundException.class, () -> bookingCommandService.handle(command));
     }
 
     // -------------------------------------------------------------------------
@@ -244,10 +245,11 @@ public class BookingCommandServiceImplTest {
     @DisplayName("handle(DeleteBookingCommand) should throw BookingNotFoundException when booking does not exist (AAA)")
     void handle_DeleteBookingCommand_ShouldThrowException_WhenBookingDoesNotExist() {
         // Arrange
+        var command = new DeleteBookingCommand(999L);
         when(bookingRepository.existsById(999L)).thenReturn(false);
 
         // Act & Assert
-        assertThrows(BookingNotFoundException.class, () -> bookingCommandService.handle(new DeleteBookingCommand(999L)));
+        assertThrows(BookingNotFoundException.class, () -> bookingCommandService.handle(command));
         verify(bookingRepository, times(1)).existsById(999L);
         verify(bookingRepository, never()).deleteById(anyLong());
     }
@@ -283,10 +285,11 @@ public class BookingCommandServiceImplTest {
         // Arrange
         var booking = new Booking(new CreateBookingCommand(10L, 2L, 1L, getDate(1), getDate(2)), 80.0);
         booking.confirm(); // Status is already CONFIRMED
+        var command = new ConfirmBookingCommand(100L);
         when(bookingRepository.findById(100L)).thenReturn(Optional.of(booking));
 
         // Act & Assert
-        assertThrows(InvalidBookingStatusException.class, () -> bookingCommandService.handle(new ConfirmBookingCommand(100L)));
+        assertThrows(InvalidBookingStatusException.class, () -> bookingCommandService.handle(command));
         verify(bookingRepository, never()).save(any(Booking.class));
     }
 }

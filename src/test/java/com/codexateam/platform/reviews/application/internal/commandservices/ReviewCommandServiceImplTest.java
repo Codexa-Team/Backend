@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ReviewCommandServiceImplTest {
+class ReviewCommandServiceImplTest {
 
     @Mock
     private ReviewRepository reviewRepository;

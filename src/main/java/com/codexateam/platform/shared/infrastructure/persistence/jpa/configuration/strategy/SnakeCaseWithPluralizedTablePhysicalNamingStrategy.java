@@ -1,11 +1,10 @@
 package com.codexateam.platform.shared.infrastructure.persistence.jpa.configuration.strategy;
 
 import io.github.encryptorcode.pluralize.Pluralize;
+import java.util.Locale;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
-
-import java.util.Locale;
 
 /**
  * Implements a physical naming strategy for Hibernate.
@@ -49,6 +48,7 @@ public class SnakeCaseWithPluralizedTablePhysicalNamingStrategy implements Physi
     /**
      * Helper method to convert a text to snake_case.
      * e.g., "myVariableName" becomes "my_variable_name".
+     *
      * @param identifier The logical identifier.
      * @return The snake_case identifier.
      */

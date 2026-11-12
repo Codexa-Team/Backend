@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ReviewTest {
+class ReviewTest {
 
     @Test
     @DisplayName("Review constructor from CreateReviewCommand initializes all attributes (AAA)")

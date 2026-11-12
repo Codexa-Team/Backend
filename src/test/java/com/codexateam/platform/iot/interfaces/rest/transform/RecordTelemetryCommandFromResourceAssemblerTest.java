@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RecordTelemetryCommandFromResourceAssemblerTest {
+class RecordTelemetryCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform RecordTelemetryResource into RecordTelemetryCommand (AAA)")

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserResourceFromEntityAssemblerTest {
+class UserResourceFromEntityAssemblerTest {
 
     @Test
     @DisplayName("toResourceFromEntity transforms User with roles to UserResource (AAA)")

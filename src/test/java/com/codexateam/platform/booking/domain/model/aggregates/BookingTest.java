@@ -9,7 +9,7 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BookingTest {
+class BookingTest {
 
     @Test
     @DisplayName("Booking constructor sets attributes and initializes status to PENDING (AAA)")

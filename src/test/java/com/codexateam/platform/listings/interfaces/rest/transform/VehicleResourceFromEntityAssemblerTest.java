@@ -13,7 +13,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VehicleResourceFromEntityAssemblerTest {
+class VehicleResourceFromEntityAssemblerTest {
 
     private VehicleResourceFromEntityAssembler assembler;
 

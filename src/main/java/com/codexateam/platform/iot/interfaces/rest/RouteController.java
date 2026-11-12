@@ -1,20 +1,22 @@
 package com.codexateam.platform.iot.interfaces.rest;
 
-import com.codexateam.platform.iot.domain.model.queries.GetRouteQuery;
 import com.codexateam.platform.iot.domain.model.queries.GetCompleteRouteQuery;
+import com.codexateam.platform.iot.domain.model.queries.GetRouteQuery;
 import com.codexateam.platform.iot.domain.services.RouteQueryService;
 import com.codexateam.platform.iot.infrastructure.external.dto.RouteResponse;
-import com.codexateam.platform.iot.interfaces.rest.resources.RouteCoordinateResource;
 import com.codexateam.platform.iot.interfaces.rest.resources.CompleteRouteResource;
+import com.codexateam.platform.iot.interfaces.rest.resources.RouteCoordinateResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller exposing vehicle route geometry using OpenRouteService.
@@ -79,7 +81,9 @@ public class RouteController {
      * @return Complete route information
      */
     @GetMapping("/complete-route")
-    @Operation(summary = "Get Complete Route", description = "Get complete route information with distance and duration")
+    @Operation(
+            summary = "Get Complete Route",
+            description = "Get complete route information with distance and duration")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Route found successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid coordinates"),

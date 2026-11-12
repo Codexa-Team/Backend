@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest {
+class UserTest {
 
     @Test
     @DisplayName("User constructor without roles initializes fields and empty roles set (AAA)")

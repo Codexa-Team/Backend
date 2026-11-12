@@ -6,10 +6,9 @@ import com.codexateam.platform.listings.domain.model.queries.GetVehicleByIdQuery
 import com.codexateam.platform.listings.domain.model.queries.GetVehiclesByOwnerIdQuery;
 import com.codexateam.platform.listings.domain.services.VehicleQueryService;
 import com.codexateam.platform.listings.infrastructure.persistence.jpa.repositories.VehicleRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of VehicleQueryService.
