@@ -7,6 +7,9 @@ import com.codexateam.platform.booking.interfaces.rest.resources.BookingResource
  * Assembler to convert Booking aggregate to BookingResource DTO.
  */
 public class BookingResourceFromEntityAssembler {
+
+    private BookingResourceFromEntityAssembler() {}
+
     /**
      * Converts a Booking entity to a BookingResource DTO.
      *

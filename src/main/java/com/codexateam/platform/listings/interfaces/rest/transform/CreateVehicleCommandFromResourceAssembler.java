@@ -7,6 +7,9 @@ import com.codexateam.platform.listings.interfaces.rest.resources.CreateVehicleR
  * Assembler to convert CreateVehicleResource DTO to CreateVehicleCommand.
  */
 public class CreateVehicleCommandFromResourceAssembler {
+
+    private CreateVehicleCommandFromResourceAssembler() {}
+
     /**
      * Converts a CreateVehicleResource DTO to a CreateVehicleCommand.
      * The owner ID is injected from the security context (authenticated user).

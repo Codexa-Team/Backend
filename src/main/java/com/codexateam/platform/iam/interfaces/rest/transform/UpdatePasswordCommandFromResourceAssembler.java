@@ -7,6 +7,9 @@ import com.codexateam.platform.iam.interfaces.rest.resources.UpdatePasswordResou
  * Assembler to convert UpdatePasswordResource to UpdatePasswordCommand.
  */
 public class UpdatePasswordCommandFromResourceAssembler {
+
+    private UpdatePasswordCommandFromResourceAssembler() {}
+
     /**
      * Converts an UpdatePasswordResource DTO to an UpdatePasswordCommand.
      *

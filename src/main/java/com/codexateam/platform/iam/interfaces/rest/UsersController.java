@@ -122,7 +122,7 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userCommandService.handle(new DeleteUserCommand(userId));
         return ResponseEntity.noContent().build();
     }

@@ -191,7 +191,7 @@ public class TelemetryController {
 
         Date now = new Date();
         bookingRepository
-                .findFirstByVehicleIdAndBookingStatus_StatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                .findFirstActiveBookingByVehicleAndStatus(
                         vehicleId, BOOKING_STATUS_CONFIRMED, now, now)
                 .flatMap(booking -> userRepository.findById(booking.getRenterId()).map(User::getName))
                 .ifPresent(resource::setRenterName);

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AuthenticatedUserResourceFromEntityAssemblerTest {
+class AuthenticatedUserResourceFromEntityAssemblerTest {
 
     @Test
     @DisplayName("toResourceFromEntity transforms User and token to AuthenticatedUserResource (AAA)")

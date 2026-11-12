@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BookingStatusTest {
+class BookingStatusTest {
 
     @Test
     @DisplayName("BookingStatus.createPending() creates status with PENDING value (AAA)")

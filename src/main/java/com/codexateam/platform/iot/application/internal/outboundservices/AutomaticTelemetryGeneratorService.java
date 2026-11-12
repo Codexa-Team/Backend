@@ -23,6 +23,7 @@ public class AutomaticTelemetryGeneratorService {
     private final Map<Long, Date> lastHeartbeatMap = new ConcurrentHashMap<>();
 
     public AutomaticTelemetryGeneratorService() {
+        // Default constructor required for Spring bean instantiation
     }
 
     /**

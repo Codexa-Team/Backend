@@ -216,14 +216,14 @@ public class BookingCommandServiceImpl implements BookingCommandService {
             throw new VehicleNotAvailableException(command.vehicleId(), vehicleResource.status());
         }
         boolean hasPendingOverlap = bookingRepository
-                .existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
+                .existsOverlappingBookingByStatus(
                         command.vehicleId(),
                         BookingStatus.PENDING,
                         command.endDate(),
                         command.startDate()
                 );
         boolean hasConfirmedOverlap = bookingRepository
-                .existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
+                .existsOverlappingBookingByStatus(
                         command.vehicleId(),
                         BookingStatus.CONFIRMED,
                         command.endDate(),

@@ -78,9 +78,9 @@ public class AuthenticationController {
     @PostMapping("/sign-up")
     public ResponseEntity<UserResource> signUp(@RequestBody SignUpResource resource) {
         Roles roleEnum;
-        if ("arrendador".equalsIgnoreCase(resource.role())) {
+        if (ROLE_ARRENDADOR_STRING.equalsIgnoreCase(resource.role())) {
             roleEnum = Roles.ROLE_ARRENDADOR;
-        } else if ("arrendatario".equalsIgnoreCase(resource.role())) {
+        } else if (ROLE_ARRENDATARIO_STRING.equalsIgnoreCase(resource.role())) {
             roleEnum = Roles.ROLE_ARRENDATARIO;
         } else {
             return ResponseEntity.badRequest().build();
@@ -110,7 +110,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "401", description = "Invalid email or password")
     })
     @PostMapping("/sign-in")
-    public ResponseEntity<?> signIn(@RequestBody SignInResource resource) {
+    public ResponseEntity<Object> signIn(@RequestBody SignInResource resource) {
         try {
             var command = SignInCommandFromResourceAssembler.toCommandFromResource(resource);
             var user = userCommandService.handle(command)

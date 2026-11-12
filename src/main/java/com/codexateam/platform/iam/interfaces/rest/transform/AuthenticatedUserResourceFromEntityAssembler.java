@@ -1,6 +1,7 @@
 package com.codexateam.platform.iam.interfaces.rest.transform;
 
 import com.codexateam.platform.iam.domain.model.aggregates.User;
+import com.codexateam.platform.iam.domain.model.entities.Role;
 import com.codexateam.platform.iam.interfaces.rest.resources.AuthenticatedUserResource;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,9 @@ import java.util.stream.Collectors;
  * Assembler to convert User entity to AuthenticatedUserResource DTO.
  */
 public class AuthenticatedUserResourceFromEntityAssembler {
+
+    private AuthenticatedUserResourceFromEntityAssembler() {}
+
     /**
      * Converts a User entity and JWT token to an AuthenticatedUserResource DTO.
      *
@@ -17,7 +21,7 @@ public class AuthenticatedUserResourceFromEntityAssembler {
      */
     public static AuthenticatedUserResource toResourceFromEntity(User user, String token) {
         var roles = user.getRoles().stream()
-                .map(role -> role.getStringName())
+                .map(Role::getStringName)
                 .collect(Collectors.toSet());
         return new AuthenticatedUserResource(
                 user.getId(), user.getEmailAddress().value(), user.getName(), roles, token);

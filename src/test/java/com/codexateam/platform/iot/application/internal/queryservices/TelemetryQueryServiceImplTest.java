@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TelemetryQueryServiceImplTest {
+class TelemetryQueryServiceImplTest {
 
     @Mock
     private TelemetryRepository telemetryRepository;
@@ -78,11 +78,12 @@ public class TelemetryQueryServiceImplTest {
     @DisplayName("handle(GetLatestTelemetryQuery) should throw UnauthorizedAccessException when neither owner nor active booking (AAA)")
     void handle_GetLatestTelemetryQuery_ShouldThrowException_WhenUnauthorized() {
         // Arrange
+        var query = new GetLatestTelemetryQuery(10L);
         when(externalListingsService.isVehicleOwner(10L, 5L)).thenReturn(false);
         when(externalBookingService.hasTrackingPermission(5L, 10L)).thenReturn(false);
 
         // Act & Assert
-        assertThrows(UnauthorizedAccessException.class, () -> telemetryQueryService.handle(new GetLatestTelemetryQuery(10L), 5L));
+        assertThrows(UnauthorizedAccessException.class, () -> telemetryQueryService.handle(query, 5L));
         verify(telemetryRepository, never()).findFirstByVehicleIdOrderByCreatedAtDesc(anyLong());
     }
 
@@ -106,11 +107,12 @@ public class TelemetryQueryServiceImplTest {
     @DisplayName("handle(GetTelemetryByVehicleIdQuery) throws UnauthorizedAccessException when unauthorized (AAA)")
     void handle_GetTelemetryByVehicleIdQuery_ShouldThrowUnauthorized() {
         // Arrange
+        var query = new GetTelemetryByVehicleIdQuery(10L);
         when(externalListingsService.isVehicleOwner(10L, 99L)).thenReturn(false);
         when(externalBookingService.hasTrackingPermission(99L, 10L)).thenReturn(false);
 
         // Act & Assert
-        assertThrows(UnauthorizedAccessException.class, () -> telemetryQueryService.handle(new GetTelemetryByVehicleIdQuery(10L), 99L));
+        assertThrows(UnauthorizedAccessException.class, () -> telemetryQueryService.handle(query, 99L));
         verify(telemetryRepository, never()).findByVehicleId(anyLong(), any(Sort.class));
     }
 

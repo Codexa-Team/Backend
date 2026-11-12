@@ -7,6 +7,9 @@ import com.codexateam.platform.booking.interfaces.rest.resources.CreateBookingRe
  * Assembler to convert CreateBookingResource DTO to CreateBookingCommand.
  */
 public class CreateBookingCommandFromResourceAssembler {
+
+    private CreateBookingCommandFromResourceAssembler() {}
+
     /**
      * Converts a CreateBookingResource DTO to a CreateBookingCommand.
      *

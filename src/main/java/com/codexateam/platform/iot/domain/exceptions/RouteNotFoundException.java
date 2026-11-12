@@ -6,6 +6,7 @@ import com.codexateam.platform.shared.domain.exceptions.ResourceNotFoundExceptio
  * Exception thrown when a route cannot be retrieved from the external routing service.
  * This may occur due to invalid coordinates, network issues, or service unavailability.
  */
+@SuppressWarnings("java:S110")
 public class RouteNotFoundException extends ResourceNotFoundException {
 
     /**

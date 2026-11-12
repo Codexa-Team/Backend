@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -47,11 +49,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @param startDate The start date of the new booking
      * @return true if there's an overlapping booking with the given status
      */
-    boolean existsByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
-            Long vehicleId,
-            String bookingStatus,
-            Date endDate,
-            Date startDate);
+    @Query("""
+            SELECT COUNT(b) > 0 FROM Booking b
+            WHERE b.vehicleId = :vehicleId
+              AND b.bookingStatus.status = :bookingStatus
+              AND b.startDate < :endDate
+              AND b.endDate > :startDate
+            """)
+    boolean existsOverlappingBookingByStatus(
+            @Param("vehicleId") Long vehicleId,
+            @Param("bookingStatus") String bookingStatus,
+            @Param("endDate") Date endDate,
+            @Param("startDate") Date startDate);
 
     /**
      * Finds all bookings for a vehicle with a specific status within a date range.
@@ -63,11 +72,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @param startDate The start date boundary
      * @return List of bookings matching the criteria
      */
-    List<Booking> findByVehicleIdAndBookingStatus_StatusAndStartDateLessThanAndEndDateGreaterThan(
-            Long vehicleId,
-            String status,
-            Date endDate,
-            Date startDate);
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.vehicleId = :vehicleId
+              AND b.bookingStatus.status = :status
+              AND b.startDate < :endDate
+              AND b.endDate > :startDate
+            """)
+    List<Booking> findOverlappingBookingsByStatus(
+            @Param("vehicleId") Long vehicleId,
+            @Param("status") String status,
+            @Param("endDate") Date endDate,
+            @Param("startDate") Date startDate);
 
     /**
      * Deletes all bookings by vehicleId.
@@ -86,10 +102,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @param currentTimestamp2 The upper timestamp bound for the interval
      * @return List of active confirmed bookings
      */
-    List<Booking> findByBookingStatus_StatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-            String status,
-            Date currentTimestamp,
-            Date currentTimestamp2);
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.bookingStatus.status = :status
+              AND b.startDate <= :currentTimestamp
+              AND b.endDate >= :currentTimestamp2
+            """)
+    List<Booking> findActiveBookingsByStatus(
+            @Param("status") String status,
+            @Param("currentTimestamp") Date currentTimestamp,
+            @Param("currentTimestamp2") Date currentTimestamp2);
 
     /**
      * Finds a confirmed booking for a vehicle that includes the given timestamp.
@@ -100,9 +122,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @param endBoundary The end date boundary
      * @return An optional booking that matches the criteria
      */
-    Optional<Booking> findFirstByVehicleIdAndBookingStatus_StatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-            Long vehicleId,
-            String status,
-            Date startBoundary,
-            Date endBoundary);
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.vehicleId = :vehicleId
+              AND b.bookingStatus.status = :status
+              AND b.startDate <= :startBoundary
+              AND b.endDate >= :endBoundary
+            ORDER BY b.id ASC
+            LIMIT 1
+            """)
+    Optional<Booking> findFirstActiveBookingByVehicleAndStatus(
+            @Param("vehicleId") Long vehicleId,
+            @Param("status") String status,
+            @Param("startBoundary") Date startBoundary,
+            @Param("endBoundary") Date endBoundary);
 }

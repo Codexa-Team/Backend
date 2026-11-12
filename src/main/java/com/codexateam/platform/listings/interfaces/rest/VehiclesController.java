@@ -108,7 +108,7 @@ public class VehiclesController {
             var vehicleResource = vehicleResourceFromEntityAssembler.toResourceFromEntity(vehicle);
             return ResponseEntity.status(HttpStatus.CREATED).body(vehicleResource);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading image file: " + e.getMessage(), e);
+            throw new IllegalStateException("Error reading image file: " + e.getMessage(), e);
         }
     }
 
@@ -238,7 +238,7 @@ public class VehiclesController {
             var vehicleResource = vehicleResourceFromEntityAssembler.toResourceFromEntity(updatedVehicle.get());
             return ResponseEntity.ok(vehicleResource);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading image file: " + e.getMessage(), e);
+            throw new IllegalStateException("Error reading image file: " + e.getMessage(), e);
         }
     }
 
@@ -255,7 +255,7 @@ public class VehiclesController {
             @ApiResponse(responseCode = "204", description = "Vehicle deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    public ResponseEntity<?> deleteVehicle(@PathVariable Long vehicleId) {
+    public ResponseEntity<Void> deleteVehicle(@PathVariable Long vehicleId) {
         var command = new DeleteVehicleCommand(vehicleId);
         vehicleCommandService.handle(command);
         return ResponseEntity.noContent().build();

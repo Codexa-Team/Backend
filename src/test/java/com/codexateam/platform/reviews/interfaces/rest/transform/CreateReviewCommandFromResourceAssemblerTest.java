@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateReviewCommandFromResourceAssemblerTest {
+class CreateReviewCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform CreateReviewResource into CreateReviewCommand (AAA)")

@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TelemetryCommandServiceImplTest {
+class TelemetryCommandServiceImplTest {
 
     @Mock
     private TelemetryRepository telemetryRepository;

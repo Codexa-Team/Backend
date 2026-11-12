@@ -15,7 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RoleCommandServiceImplTest {
+class RoleCommandServiceImplTest {
 
     @Mock
     private RoleRepository roleRepository;

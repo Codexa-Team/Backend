@@ -10,6 +10,9 @@ import java.util.List;
  * Declared as public to be accessible from controllers and services.
  */
 public class TelemetryResourceFromEntityAssembler {
+
+    private TelemetryResourceFromEntityAssembler() {}
+
     /** Converts a Telemetry aggregate to a resource without a planned route. */
     public static TelemetryResource toResourceFromEntity(Telemetry entity) {
         return new TelemetryResource(

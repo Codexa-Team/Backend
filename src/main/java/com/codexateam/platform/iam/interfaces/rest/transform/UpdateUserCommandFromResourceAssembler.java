@@ -7,6 +7,9 @@ import com.codexateam.platform.iam.interfaces.rest.resources.UpdateUserResource;
  * Assembler to convert UpdateUserResource to UpdateUserCommand.
  */
 public class UpdateUserCommandFromResourceAssembler {
+
+    private UpdateUserCommandFromResourceAssembler() {}
+
     /**
      * Converts an UpdateUserResource DTO to an UpdateUserCommand.
      *

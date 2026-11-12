@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RoleResourceFromEntityAssemblerTest {
+class RoleResourceFromEntityAssemblerTest {
 
     @Test
     @DisplayName("toResourceFromEntity transforms Role entity to RoleResource (AAA)")

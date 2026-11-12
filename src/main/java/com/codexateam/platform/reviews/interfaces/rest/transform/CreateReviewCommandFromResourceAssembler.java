@@ -7,6 +7,9 @@ import com.codexateam.platform.reviews.interfaces.rest.resources.CreateReviewRes
  * Assembler to convert CreateReviewResource DTO to CreateReviewCommand.
  */
 public class CreateReviewCommandFromResourceAssembler {
+
+    private CreateReviewCommandFromResourceAssembler() {}
+
     /**
      * Converts a CreateReviewResource DTO to a CreateReviewCommand.
      *

@@ -287,7 +287,7 @@ public class BookingsController {
             @ApiResponse(responseCode = "404", description = "Booking not found")
     })
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<?> deleteBooking(@PathVariable Long bookingId) {
+    public ResponseEntity<Void> deleteBooking(@PathVariable Long bookingId) {
         bookingCommandService.handle(new DeleteBookingCommand(bookingId));
         return ResponseEntity.noContent().build();
     }

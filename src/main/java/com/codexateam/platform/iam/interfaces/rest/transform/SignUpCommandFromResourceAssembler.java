@@ -9,6 +9,9 @@ import java.util.Set;
  * Assembler to convert SignUpResource DTO to SignUpCommand.
  */
 public class SignUpCommandFromResourceAssembler {
+
+    private SignUpCommandFromResourceAssembler() {}
+
     /**
      * Converts a SignUpResource DTO to a SignUpCommand.
      *

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateVehicleCommandFromResourceAssemblerTest {
+class CreateVehicleCommandFromResourceAssemblerTest {
 
     @Test
     @DisplayName("toCommandFromResource should transform CreateVehicleResource into CreateVehicleCommand (AAA)")

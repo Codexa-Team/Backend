@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
  * Assembler to convert User entity to UserResource DTO.
  */
 public class UserResourceFromEntityAssembler {
+
+    private UserResourceFromEntityAssembler() {}
+
     /**
      * Converts a User entity to a UserResource DTO.
      *

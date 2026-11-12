@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ReviewRecordsTest {
+class ReviewRecordsTest {
 
     @Test
     @DisplayName("CreateReviewCommand record preserves values and equals/hashCode contract (AAA)")
